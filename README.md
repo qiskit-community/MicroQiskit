@@ -1,5 +1,4 @@
-# Aether
-### Quantum for Microcontrollers
+# Aether - Quantum for Microcontrollers
 
 Microcontrollers are a popular platform for hobbyist and educational programming. Quantum computation is an emerging technology that also promises to be great for these purposes. So let's combine them!
 
