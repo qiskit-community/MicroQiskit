@@ -58,52 +58,40 @@ class QuantumCircuit:
         self.h(t)
         self.cx(c,t)
         self.h(t)
-class Job:
-    def __init__(self,qc,shots):
-        self.qc = qc
-        self.shots = shots
-    def result(self):
-        return Result(self.qc,self.shots)
-class Result:
-    def __init__(self,qc,shots):
-        self.qc = qc
-        self.shots = shots
-    def get_counts(self):
-        probs = {}
-        if self.qc._nq==2:
-            probs['00'] = (1+self.qc.expectations['IZ']+self.qc.expectations['ZI']+self.qc.expectations['ZZ'])/4
-            probs['01'] = (1-self.qc.expectations['IZ']+self.qc.expectations['ZI']-self.qc.expectations['ZZ'])/4
-            probs['10'] = (1+self.qc.expectations['IZ']-self.qc.expectations['ZI']-self.qc.expectations['ZZ'])/4
-            probs['11'] = (1-self.qc.expectations['IZ']-self.qc.expectations['ZI']+self.qc.expectations['ZZ'])/4
-        elif self.qc._nq==1:
-            probs['0'] = (1+self.qc.expectations['Z'])/2
-            probs['1'] = (1-self.qc.expectations['Z'])/2
-        counts = {}
-        if self.shots==0:
-            for string in probs:
-                counts[string] = probs[string]
-        else:
-            for string in probs:
-                counts[string] = 0
-            for shot in range(self.shots):
-                cumu = 0
-                unchosen = True
-                for string in counts:
-                    cumu += probs[string]
-                    if random.random()<cumu and unchosen:
-                        counts[string] += 1
-                        unchosen = False
-        return counts
-def execute(qc,backend,shots=1024):
-    return Job(qc,shots)
+def execute(qc,shots=1024):
+      probs = {}
+      if qc._nq==2:
+          probs['00'] = (1+qc.expectations['IZ']+qc.expectations['ZI']+qc.expectations['ZZ'])/4
+          probs['01'] = (1-qc.expectations['IZ']+qc.expectations['ZI']-qc.expectations['ZZ'])/4
+          probs['10'] = (1+qc.expectations['IZ']-qc.expectations['ZI']-qc.expectations['ZZ'])/4
+          probs['11'] = (1-qc.expectations['IZ']-qc.expectations['ZI']+qc.expectations['ZZ'])/4
+      elif qc._nq==1:
+          probs['0'] = (1+qc.expectations['Z'])/2
+          probs['1'] = (1-qc.expectations['Z'])/2
+      counts = {}
+      if shots==0:
+          for string in probs:
+              counts[string] = probs[string]
+      else:
+          for string in probs:
+              counts[string] = 0
+          for shot in range(shots):
+              cumu = 0
+              unchosen = True
+              for string in counts:
+                  cumu += probs[string]
+                  if random.random()<cumu and unchosen:
+                      counts[string] += 1
+                      unchosen = False
+      return counts
 
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.h(1)
+  
 while True:
 
-    qc = QuantumCircuit(2)
-    qc.h(0)
-    qc.h(1)
-    job = execute(qc,None,shots=1)
-    counts = job.result().get_counts()
+    counts = execute(qc,shots=1)
     if counts['00']==1:
         display.show(Image.HEART)
     elif counts['01']==1:
