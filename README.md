@@ -33,7 +33,7 @@ The most common choice is to extract a single output bit from each qubit, and to
     for j in range(n):
         qc.measure(n,n)               # Qiskit
 
-This is the case that is hardwired into Aether. As such, so `measure` command is required.
+This is the case that is hardwired into Aether. As such, no `measure` command is required.
 
 
 ### Running a circuit
