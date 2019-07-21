@@ -2,7 +2,7 @@
 
 Microcontrollers are a popular platform for hobbyist and educational programming. Quantum computation is an emerging technology that also promises to be great for these purposes. So let's combine them!
 
-The best way to do quantum computing is with [Qiskit](https://github.com/qiskit/). This is an open-source Python framework with which quantum programs can be written, tested and run on prototype quantum devices. The many features of Qiskit, however, make it rather hard to fit quantumness on a microcontroller. 
+The best way to do quantum computing is with [Qiskit](https://github.com/qiskit/). This is an open-source Python framework with which quantum programs can be written, tested and run on [IBM's prototype quantum devices](https://www.research.ibm.com/ibm-q/). The many features of Qiskit, however, make it rather hard to fit quantumness on a microcontroller. 
 
 There are many ways to try solving this problem. For example, if you can use the internet with your microcontroller, you could delegate all the tricky bits to the cloud.
 
