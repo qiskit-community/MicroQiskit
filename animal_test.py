@@ -105,12 +105,12 @@ while True:
     job = execute(qc,None,shots=1)
     counts = job.result().get_counts()
     if counts['00']==1:
-        display.show(Image.RABBIT)
+        display.show(Image.HEART)
     elif counts['01']==1:
         display.show(Image.DUCK)
     elif counts['10']==1:
-        display.show(Image.TORTOISE)
+        display.show(Image.HAPPY)
     else:
-        display.show(Image.BUTTERFLY)
+        display.show(Image.PACMAN)
         
     sleep(1000)
