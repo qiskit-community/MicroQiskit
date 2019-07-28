@@ -1,27 +1,39 @@
-from microbit import *
-
 import random
 pi = 3.14159265359
 def cos(t):
-    return 1 - t**2/2 + t**4/24 - t**6/720 + t**8/40320 + t**10/3628800 - t**12/479001600
+    t = t % (2*pi)
+    c = 1
+    term = 1
+    for j in range(1,16):
+        term = -term * t**2/(2*j*(2*j-1))
+        c += term
+    return c
 def sin(t):
-    return t - t**3/6 + t**5/120 - t**7/5040 + t**9/362880 - t**11/39916800  + t**13/6227020800
+    t = t % (2*pi)
+    s = t
+    term = t
+    for j in range(2,16):
+        term = -term * t**2/((2*j-1)*(2*j-2))
+        s += term
+    return s
 class QuantumCircuit:
     def __init__(self,nq):
         self._nq = nq
         self.p2s = ['I','X','Y','Z']*(self._nq==2) + ['']*(self._nq==1)
         self.expectations = {}
+        self.reset()
+    def _pauli(self,p1,p2,q):
+        if q==1:
+            return p1+p2
+        else:
+            return p2+p1
+    def reset (self):
         for p1 in ['I','X','Y','Z']:
             for p2 in self.p2s:
                 self.expectations[p1+p2] = 0
         for p1 in ['I','Z']:
             for p2 in ['I','Z']*(self._nq==2) + ['']*(self._nq==1):
                 self.expectations[p1+p2] = 1
-    def _pauli(self,p1,p2,q):
-        if q==1:
-            return p1+p2
-        else:
-            return p2+p1
     def x(self,q):
         for p2 in self.p2s:
             for p1 in ['Y','Z']:
@@ -46,7 +58,7 @@ class QuantumCircuit:
             self.expectations[self._pauli('Y',p2,q)] = c*old_y + s*old_x
     def rx(self,theta,q):
         self.h(q)
-        self.rz(q)
+        self.rz(theta,q)
         self.h(q)
     def cz(self,c=0,t=0):
         if self._nq==2:
@@ -59,32 +71,35 @@ class QuantumCircuit:
         self.cx(c,t)
         self.h(t)
 def execute(qc,shots=1024):
-      probs = {}
-      if qc._nq==2:
-          probs['00'] = (1+qc.expectations['IZ']+qc.expectations['ZI']+qc.expectations['ZZ'])/4
-          probs['01'] = (1-qc.expectations['IZ']+qc.expectations['ZI']-qc.expectations['ZZ'])/4
-          probs['10'] = (1+qc.expectations['IZ']-qc.expectations['ZI']-qc.expectations['ZZ'])/4
-          probs['11'] = (1-qc.expectations['IZ']-qc.expectations['ZI']+qc.expectations['ZZ'])/4
-      elif qc._nq==1:
-          probs['0'] = (1+qc.expectations['Z'])/2
-          probs['1'] = (1-qc.expectations['Z'])/2
-      counts = {}
-      if shots==0:
-          for string in probs:
-              counts[string] = probs[string]
-      else:
-          for string in probs:
-              counts[string] = 0
-          for shot in range(shots):
-              cumu = 0
-              unchosen = True
-              for string in counts:
-                  cumu += probs[string]
-                  if random.random()<cumu and unchosen:
-                      counts[string] += 1
-                      unchosen = False
-      return counts
+    probs = {}
+    if qc._nq==2:
+        probs['00'] = (1+qc.expectations['IZ']+qc.expectations['ZI']+qc.expectations['ZZ'])/4
+        probs['01'] = (1-qc.expectations['IZ']+qc.expectations['ZI']-qc.expectations['ZZ'])/4
+        probs['10'] = (1+qc.expectations['IZ']-qc.expectations['ZI']+qc.expectations['ZZ'])/4
+        probs['11'] = (1-qc.expectations['IZ']-qc.expectations['ZI']-qc.expectations['ZZ'])/4
+    elif qc._nq==1:
+        probs['0'] = (1+qc.expectations['Z'])/2
+        probs['1'] = (1-qc.expectations['Z'])/2
+    counts = {}
+    if shots==0:
+        for string in probs:
+            counts[string] = probs[string]
+    else:
+        for string in probs:
+            counts[string] = 0
+        for shot in range(shots):
+            cumu = 0
+            unchosen = True
+            r = random.random()
+            for string in counts:
+                cumu += probs[string]
+                if r<cumu and unchosen:
+                    counts[string] += 1
+                    unchosen = False
+    return counts
 
+from microbit import *
+  
 qc = QuantumCircuit(2)
 qc.h(0)
 qc.h(1)
