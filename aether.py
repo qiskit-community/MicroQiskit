@@ -1,5 +1,4 @@
 import random
-import numpy as np
 pi = 3.14159265359
 def cos(t):
     t = t % (2*pi)
