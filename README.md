@@ -60,7 +60,7 @@ The simulation in Aether is done on the fly by the quantum circuit object. This 
     
 ### Available gates
 
-Quantum gates are added to circuits in Aether in the same way as in Qiskit. The main difference is that the set of available gates in Aether is limited to `x`, `z`, `cx`, `cz`, `rx`, `rz` and `h`. It is also not advisable to use `rx` and `rz` with a `theta` outside the range from -pi/2 to pi/2. Instead use these gates multiple times with angles inside this range, or combine with other gates.
+Quantum gates are added to circuits in Aether in the same way as in Qiskit. The main difference is that the set of available gates in Aether is limited to `x`, `cx`, `rx`, and `h`. All others can be created if and when required from this basic set.
 
 ## Aether in action!
 
