@@ -1,77 +1,87 @@
 import random
 pi=3.14159265359
-def cos(t):
-  t=t%(2*pi)
+def cos(T):
+  T=T%(2*pi)
   c=1
-  tm=1
+  t=1
   for j in range(1,16):
-    tm=-tm*t**2/(2*j*(2*j-1))
-    c+=tm
+    t=-t*T**2/(2*j*(2*j-1))
+    c+=t
   return c
-def sin(t):
-  return cos(t-pi/2)
+def sin(T):
+  return cos(T-pi/2)
 class QuantumCircuit:
-  def __init__(qc,nq):
-    qc._nq=nq
-    qc.p2s=['I','X','Y','Z']*(qc._nq==2)+['']*(qc._nq==1)
-    qc.exp={}
-    qc.reset()
-  def _pl(qc,p1,p2,q):
-    return (p1+p2)*(q==1) + (p2+p1)*(q==0)
-  def reset (qc):
-    for p1 in ['I','X','Y','Z']:
-      for p2 in qc.p2s:
-        qc.exp[p1+p2]=(('X' not in (p1+p2))and('Y' not in (p1+p2) ))
-  def x(qc,q):
-    for p2 in qc.p2s:
-      for p1 in ['Y','Z']:
-        qc.exp[qc._pl(p1,p2,q)]=-qc.exp[qc._pl(p1,p2,q)]   
-  def h(qc,q):
-    for p2 in qc.p2s:
-      temp=qc.exp[qc._pl('X',p2,q)]
-      qc.exp[qc._pl('X',p2,q)]=qc.exp[qc._pl('Z',p2,q)]
-      qc.exp[qc._pl('Z',p2,q)]=temp
-      qc.exp[qc._pl('Y',p2,q)]=-qc.exp[qc._pl('Y',p2,q)]
-  def rx(qc,theta,q):
-    c=cos(theta)
-    s=sin(theta)
-    for p2 in qc.p2s:
-      old_z=qc.exp[qc._pl('Z',p2,q)]
-      old_y=qc.exp[qc._pl('Y',p2,q)]
-      qc.exp[qc._pl('Z',p2,q)]=c*old_z-s*old_y
-      qc.exp[qc._pl('Y',p2,q)]=c*old_y+s*old_z
-  def cx(qc,c=0,t=0):
-    if qc._nq==2:
-      qc.h(t)
+  def __init__(c,n):
+    c.n=n
+    c.data = []
+  def x(c,q):
+    c.data.append(('r',pi,q))
+  def rx(c,T,q):
+    c.data.append(('r',T,q))
+  def h(c,q):
+    c.data.append(('h',q))
+  def cx(c,s,t):
+    c.data.append(('cx',t))
+def execute(c,shots=1024,output='counts'):
+  p2s=['I','X','Y','Z']*(c.n==2)+['']*(c.n==1)
+  def j(p1,p2,q):
+    return (p1+p2)*(q==1)+(p2+p1)*(q==0)
+  def h(q):
+    for p2 in p2s:
+      t=E[j('X',p2,q)]
+      E[j('X',p2,q)]=E[j('Z',p2,q)]
+      E[j('Z',p2,q)]=t
+      E[j('Y',p2,q)]=-E[j('Y',p2,q)]
+  E={}
+  for p1 in ['I','X','Y','Z']:
+    for p2 in p2s:
+      E[p1+p2]=int(('X' not in (p1+p2))and('Y' not in (p1+p2) ))
+  for gate in c.data:
+    if gate[0]=='r':
+      T,q=gate[1],gate[2]
+      C=cos(T)
+      S=sin(T)
+      for p2 in p2s:
+        z=E[j('Z',p2,q)]
+        y=E[j('Y',p2,q)]
+        E[j('Z',p2,q)]=C*z-S*y
+        E[j('Y',p2,q)]=C*y+S*z
+    if gate[0]=='h':
+      h(gate[1])
+    if gate[0]=='cx' and c.n==2:
+      q=gate[1]
+      h(q)
       for pair in [('XI','XZ'),('IX','ZX'),('YI','YZ'),('IY','ZY'),('XX','YY')]:
-        temp=qc.exp[pair[0]]
-        qc.exp[pair[0]]=qc.exp[pair[1]]
-        qc.exp[pair[1]]=temp
-      qc.h(t)
-def execute(qc,shots=1024):
-  ps={}
-  def s(out):
-    return (1-2*(out=='1'))
-  if qc._nq==2:
-    for out in ['00','01','10','11']:
-      ps[out]=(1+s(out[1])*qc.exp['IZ']+s(out[0])*qc.exp['ZI']+s(out[0])*s(out[1])*qc.exp['ZZ'])/4
-  elif qc._nq==1:
-    for out in ['0','1']:
-      ps[out]=(1+s(out)*qc.exp['Z'])/2
-  c={}
-  if shots==0:
-    for out in ps:
-      c[out]=ps[out]
+        t=E[pair[0]]
+        E[pair[0]]=E[pair[1]]
+        E[pair[1]]=t
+      h(q)
+  if output=='counts':
+    ps={}
+    def s(out):
+      return (1-2*(out=='1'))
+    if c.n==2:
+      for out in ['00','01','10','11']:
+        ps[out]=(1+s(out[1])*E['IZ']+s(out[0])*E['ZI']+s(out[0])*s(out[1])*E['ZZ'])/4
+    elif c.n==1:
+      for out in ['0','1']:
+        ps[out]=(1+s(out)*E['Z'])/2
+    c={}
+    if shots==0:
+      for out in ps:
+        c[out]=ps[out]
+    else:
+      for out in ps:
+        c[out]=0
+      for _ in range(shots):
+        cumu=0
+        un=True
+        r=random.random()
+        for out in c:
+          cumu += ps[out]
+          if r<cumu and un:
+            c[out] += 1
+            un=False
+    return c
   else:
-    for out in ps:
-      c[out]=0
-    for _ in range(shots):
-      cumu=0
-      un=True
-      r=random.random()
-      for out in c:
-        cumu += ps[out]
-        if r<cumu and un:
-          c[out] += 1
-          un=False
-  return c
+    return E
