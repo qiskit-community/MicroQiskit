@@ -13,7 +13,7 @@ def sin(T):
 class QuantumCircuit:
   def __init__(c,n):
     c.n=n
-    c.data = []
+    c.data=[]
   def x(c,q):
     c.data.append(('r',pi,q))
   def rx(c,T,q):
@@ -22,7 +22,8 @@ class QuantumCircuit:
     c.data.append(('h',q))
   def cx(c,s,t):
     c.data.append(('cx',t))
-def execute(c,shots=1024,output='counts'):
+def execute(c,shots=1024,get='counts'):
+  g=0*(get=='counts')+1*(get=='memory')+2*(get=='E')
   p2s=['I','X','Y','Z']*(c.n==2)+['']*(c.n==1)
   def j(p1,p2,q):
     return (p1+p2)*(q==1)+(p2+p1)*(q==0)
@@ -33,7 +34,7 @@ def execute(c,shots=1024,output='counts'):
       E[j('Z',p2,q)]=t
       E[j('Y',p2,q)]=-E[j('Y',p2,q)]
   E={}
-  for p1 in ['I','X','Y','Z']:
+  for p1 in['I','X','Y','Z']:
     for p2 in p2s:
       E[p1+p2]=int(('X' not in (p1+p2))and('Y' not in (p1+p2) ))
   for gate in c.data:
@@ -48,40 +49,44 @@ def execute(c,shots=1024,output='counts'):
         E[j('Y',p2,q)]=C*y+S*z
     if gate[0]=='h':
       h(gate[1])
-    if gate[0]=='cx' and c.n==2:
+    if gate[0]=='cx':
       q=gate[1]
       h(q)
-      for pair in [('XI','XZ'),('IX','ZX'),('YI','YZ'),('IY','ZY'),('XX','YY')]:
+      for pair in[('XI','XZ'),('IX','ZX'),('YI','YZ'),('IY','ZY'),('XX','YY')]:
         t=E[pair[0]]
         E[pair[0]]=E[pair[1]]
         E[pair[1]]=t
       h(q)
-  if output=='counts':
+  if g in [0,1]:
     ps={}
     def s(out):
-      return (1-2*(out=='1'))
+      return(1-2*(out=='1'))
     if c.n==2:
-      for out in ['00','01','10','11']:
+      for out in['00','01','10','11']:
         ps[out]=(1+s(out[1])*E['IZ']+s(out[0])*E['ZI']+s(out[0])*s(out[1])*E['ZZ'])/4
     elif c.n==1:
-      for out in ['0','1']:
+      for out in['0','1']:
         ps[out]=(1+s(out)*E['Z'])/2
+    m=[]
     c={}
-    if shots==0:
+    for _ in range(shots):
+      cumu=0
+      un=True
+      r=random.random()
       for out in ps:
-        c[out]=ps[out]
+        cumu += ps[out]
+        if r<cumu and un:
+          if g==1:
+            m.append(out)
+          else:
+            try:
+              c[out]+=1
+            except:
+              c[out]=1
+          un=False
+    if g==1:
+      return m
     else:
-      for out in ps:
-        c[out]=0
-      for _ in range(shots):
-        cumu=0
-        un=True
-        r=random.random()
-        for out in c:
-          cumu += ps[out]
-          if r<cumu and un:
-            c[out] += 1
-            un=False
-    return c
+      return c
   else:
     return E

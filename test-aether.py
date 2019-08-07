@@ -42,8 +42,25 @@ def test_cx():
     for bit in ['00','11']:
         assert( round( execute(qc,shots=shots)[bit]/shots,1)==0.5 )
 
+def test_memory():
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.h(1)
+    m = execute(qc,shots=shots,get='memory')
+    assert( len(m)==shots )
+    p00 = 0
+    for out in m:
+            p00 +=(out=='00')/shots
+    assert( round(p00,2)==0.25 )
+
+def test_expect():
+    assert( 'Z' in execute(QuantumCircuit(1),shots=shots,get='E') )
+    assert( 'ZZ' in execute(QuantumCircuit(2),shots=shots,get='E') )
+
 test_trig()
 test_x()
 test_rx()
 test_h()
 test_cx()
+test_memory()
+test_expect()
