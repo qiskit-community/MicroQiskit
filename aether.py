@@ -38,7 +38,13 @@ def execute(c,shots=1024,get='counts'):
     for p2 in p2s:
       E[p1+p2]=int(('X' not in (p1+p2))and('Y' not in (p1+p2) ))
   for gate in c.data:
-    if gate[0]=='r':
+    if gate[0]=='x':
+      for p2 in p2s:
+        for p1 in ['Y','Z']:
+          E[j(p1,p2,q)] = -E[j(p1,p2,q)] 
+    elif gate[0]=='h':
+      h(gate[1])
+    elif gate[0]=='r':
       T,q=gate[1],gate[2]
       C=cos(T)
       S=sin(T)
@@ -47,9 +53,7 @@ def execute(c,shots=1024,get='counts'):
         y=E[j('Y',p2,q)]
         E[j('Z',p2,q)]=C*z-S*y
         E[j('Y',p2,q)]=C*y+S*z
-    if gate[0]=='h':
-      h(gate[1])
-    if gate[0]=='cx':
+    elif gate[0]=='cx':
       q=gate[1]
       h(q)
       for pair in[('XI','XZ'),('IX','ZX'),('YI','YZ'),('IY','ZY'),('XX','YY')]:
@@ -67,26 +71,19 @@ def execute(c,shots=1024,get='counts'):
     elif c.n==1:
       for out in['0','1']:
         ps[out]=(1+s(out)*E['Z'])/2
-    m=[]
-    c={}
-    for _ in range(shots):
-      cumu=0
-      un=True
-      r=random.random()
-      for out in ps:
-        cumu += ps[out]
-        if r<cumu and un:
-          if g==1:
-            m.append(out)
-          else:
-            try:
-              c[out]+=1
-            except:
-              c[out]=1
-          un=False
-    if g==1:
-      return m
+    if g==0:
+      return {out:ps[out]*shots for out in ps}
     else:
-      return c
+      m=[]
+      for _ in range(shots):
+        cumu=0
+        un=True
+        r=random.random()
+        for out in ps:
+          cumu += ps[out]
+          if r<cumu and un:
+            m.append(out)
+            un=False
+      return m
   else:
     return E
