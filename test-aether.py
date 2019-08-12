@@ -9,58 +9,82 @@ def test_trig():
 def test_x():
     qc = QuantumCircuit(1)
     qc.x(0)
-    assert( execute(qc)['1']==1024 )
+    assert( execute(qc,shots=shots,get='statevector')==[[0.0,0.0],[1.0,0.0]] )
     qc = QuantumCircuit(2)
     qc.x(1)
-    assert( execute(qc)['10']==1024 )
+    assert( execute(qc,shots=shots,get='statevector')==[[0.0,0.0],[0.0,0.0],[1.0,0.0],[0.0,0.0]] )
+    qc = QuantumCircuit(2)
     qc.x(0)
-    assert( execute(qc)['11']==1024 )  
+    qc.x(1)
+    qc.measure(0,0)
+    qc.measure(1,1)
+    assert( execute(qc,shots=shots,get='statevector')==[[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0]] ) 
     
 def test_h():
     qc = QuantumCircuit(2)
     qc.h(0)
-    for bit in ['00','01']:
-        assert( round( execute(qc,shots=shots)[bit]/shots,1)==0.5 )
+    assert( execute(qc,shots=shots,get='statevector')==[[0.70710678118, 0.0], [0.70710678118, 0.0], [0.0, 0.0], [0.0, 0.0]] )
+    qc = QuantumCircuit(2)
+    qc.h(1)
+    assert( execute(qc,shots=shots,get='statevector')==[[0.70710678118, 0.0], [0.0, 0.0], [0.70710678118, 0.0], [0.0, 0.0]] )
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.h(1)
+    assert( execute(qc,shots=shots,get='statevector')==[[0.49999999999074046, 0.0], [0.49999999999074046, 0.0], [0.49999999999074046, 0.0], [0.49999999999074046, 0.0]] )
         
 def test_rx():
     qc = QuantumCircuit(1)
     qc.rx(pi/4,0)
-    assert( round( execute(qc,shots=shots)['0']/shots,2)==0.85 )
-    assert( round( execute(qc,shots=shots)['1']/shots,2)==0.15 ) 
+    assert(execute(qc,get='statevector')==[[0.9238795325112867, 0.0], [0.0, -0.3826834323650898]])
     qc = QuantumCircuit(2)
     qc.rx(pi/4,0)
     qc.rx(pi/8,1)
-    assert( round( execute(qc,shots=shots)['00']/shots,2)==0.82 )
-    assert( round( execute(qc,shots=shots)['01']/shots,2)==0.14 )
-    assert( round( execute(qc,shots=shots)['10']/shots,2)==0.03 ) 
-    assert( round( execute(qc,shots=shots)['11']/shots,2)==0.01 )
+    assert(execute(qc,get='statevector')==[[0.9061274463528878, 0.0], [0.0, -0.37533027751786524], [0.0, -0.18023995550173696], [-0.0746578340503426, 0.0]])
+    qc.h(0)
+    qc.h(1)
+    assert(execute(qc,get='statevector')==[[0.4157348061435736, -0.27778511650465676], [0.4903926401925336, 0.0975451610062577], [0.4903926401925336, -0.0975451610062577], [0.4157348061435736, 0.27778511650465676]])
     
 def test_cx():
     qc = QuantumCircuit(2)
     qc.h(0)
     qc.cx(0,1)
-    for bit in ['00','11']:
-        assert( round( execute(qc,shots=shots)[bit]/shots,1)==0.5 )
+    assert( execute(qc,shots=shots,get='statevector')==[[0.70710678118, 0.0], [0.0, 0.0], [0.0, 0.0], [0.70710678118, 0.0]] )
+    qc = QuantumCircuit(2)
+    qc.x(0)
+    qc.cx(0,1)
+    qc.cx(1,0)
+    qc.cx(0,1)
+    assert( execute(qc,shots=shots,get='statevector')==[[0.0, 0.0], [0.0, 0.0], [1.0, 0.0], [0.0, 0.0]] )
+    
 
 def test_memory():
     qc = QuantumCircuit(2)
     qc.h(0)
     qc.h(1)
+    qc.measure(0,0)
+    qc.measure(1,1)
     m = execute(qc,shots=shots,get='memory')
     assert( len(m)==shots )
     p00 = 0
     for out in m:
-            p00 +=(out=='00')/shots
+      p00 +=(out=='00')/shots
     assert( round(p00,2)==0.25 )
 
-def test_expect():
-    assert( 'Z' in execute(QuantumCircuit(1),shots=shots,get='E') )
-    assert( 'ZZ' in execute(QuantumCircuit(2),shots=shots,get='E') )
+def test_counts():
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.h(1)
+    qc.measure(0,0)
+    qc.measure(1,1)
+    c = execute(qc,shots=shots,get='counts')
+    for out in c:
+      p = c[out]/shots
+      assert( round(p,2)==0.25 )
 
 test_trig()
 test_x()
-test_rx()
 test_h()
+test_rx()
 test_cx()
 test_memory()
-test_expect()
+test_counts()
