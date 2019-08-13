@@ -67,11 +67,15 @@ def execute(c,shots=1024,get='counts'):
   if g==-1:
     return k
   else:
-    assert((('measure',0,0) in c.data[-2:]) and (('measure',1,1) in c.data[-2:]))
-    assert((('measure',0,0) not in c.data[:-2]) and (('measure',1,1) not in c.data[:-2]))
+    if c.n==1:
+      assert(('measure',0,0)==c.data[-1])
+      assert(('measure',0,0) not in c.data[:-1])
+    else:
+      assert((('measure',0,0) in c.data[-2:]) and (('measure',1,1) in c.data[-2:]))
+      assert((('measure',0,0) not in c.data[:-2]) and (('measure',1,1) not in c.data[:-2]))
     ps=[e[0]**2+e[1]**2 for e in k]
     if g==0:
-      return {'{0:02b}'.format(j):int(p*shots) for j,p in enumerate(ps)}
+      return {('{0:0'+str(c.n)+'b}').format(j):int(p*shots) for j,p in enumerate(ps)}
     else:
       m=[]
       for _ in range(shots):
@@ -81,7 +85,7 @@ def execute(c,shots=1024,get='counts'):
         for j,p in enumerate(ps):
           cumu += p
           if r<cumu and un:
-            out = '{0:02b}'.format(j)
+            out = ('{0:0'+str(c.n)+'b}').format(j)
             m.append(out)
             un=False
       return m

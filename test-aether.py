@@ -16,8 +16,6 @@ def test_x():
     qc = QuantumCircuit(2)
     qc.x(0)
     qc.x(1)
-    qc.measure(0,0)
-    qc.measure(1,1)
     assert( execute(qc,shots=shots,get='statevector')==[[0.0,0.0],[0.0,0.0],[0.0,0.0],[1.0,0.0]] ) 
     
 def test_h():
@@ -58,7 +56,7 @@ def test_cx():
     
 
 def test_memory():
-    qc = QuantumCircuit(2)
+    qc = QuantumCircuit(2,2)
     qc.h(0)
     qc.h(1)
     qc.measure(0,0)
@@ -69,9 +67,18 @@ def test_memory():
     for out in m:
       p00 +=(out=='00')/shots
     assert( round(p00,2)==0.25 )
+    qc = QuantumCircuit(1,1)
+    qc.h(0)
+    qc.measure(0,0)
+    m = execute(qc,shots=shots,get='memory')
+    assert( len(m)==shots )
+    p0 = 0
+    for out in m:
+      p0 +=(out=='0')/shots
+    assert( round(p0,1)==0.5 )
 
 def test_counts():
-    qc = QuantumCircuit(2)
+    qc = QuantumCircuit(2,2)
     qc.h(0)
     qc.h(1)
     qc.measure(0,0)
