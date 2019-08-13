@@ -2,8 +2,9 @@ import random
 from math import cos,sin,pi
 r2=0.70710678118
 class QuantumCircuit:
-  def __init__(c,n):
+  def __init__(c,n,m=0):
     c.n=n
+    c.m=m
     c.data=[]
   def initialize(c,k):
     c.data.clear()
@@ -17,6 +18,7 @@ class QuantumCircuit:
   def cx(c,s,t):
     c.data.append(('cx',t))
   def measure(c,q,b):
+    assert(b<c.m)
     c.data.append(('measure',q,b))
 def execute(c,shots=1024,get='counts'):
   def s(x,y):
@@ -68,25 +70,18 @@ def execute(c,shots=1024,get='counts'):
     assert((('measure',0,0) in c.data[-2:]) and (('measure',1,1) in c.data[-2:]))
     assert((('measure',0,0) not in c.data[:-2]) and (('measure',1,1) not in c.data[:-2]))
     ps=[e[0]**2+e[1]**2 for e in k]
-    m=[]
-    c = {}
-    for _ in range(shots):
-      cumu=0
-      un=True
-      r=random.random()
-      for j,p in enumerate(ps):
-        cumu += p
-        if r<cumu and un:
-          out = '{0:02b}'.format(j)
-          if g==1:
-          	m.append(out)
-          else:
-            try:
-              c[out] += 1
-            except:
-              c[out] = 1
-          un=False
-    if g==1:
-      return m
+    if g==0:
+      return {'{0:02b}'.format(j):int(p*shots) for j,p in enumerate(ps)}
     else:
-      return c
+      m=[]
+      for _ in range(shots):
+        cumu=0
+        un=True
+        r=random.random()
+        for j,p in enumerate(ps):
+          cumu += p
+          if r<cumu and un:
+            out = '{0:02b}'.format(j)
+            m.append(out)
+            un=False
+      return m
