@@ -6,6 +6,10 @@ class QuantumCircuit:
     c.n=n
     c.m=m
     c.data=[]
+  def __add__(c,c2):
+    c3 = QuantumCircuit(max(c.n,c2.n),max(c.m,c2.m))
+    c3.data = c.data + c2.data
+    return c3
   def initialize(c,k):
     c.data.clear()
     c.data.append(('init',k))

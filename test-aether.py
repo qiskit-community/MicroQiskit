@@ -87,7 +87,19 @@ def test_counts():
     for out in c:
       p = c[out]/shots
       assert( round(p,2)==0.25 )
-
+        
+def test_add():
+    for n in [1,2]:
+        qc = QuantumCircuit(n,n)
+        meas = QuantumCircuit(n,n)
+        for j in range(n):
+            qc.h(j)
+            meas.measure(j,j)
+        c = execute(qc+meas,shots=shots,get='counts')
+        for out in c:
+            p = c[out]/shots
+            assert( round(p,2)==round(1/2**n,2) )
+    
 test_trig()
 test_x()
 test_h()
@@ -95,3 +107,4 @@ test_rx()
 test_cx()
 test_memory()
 test_counts()
+test_add()
