@@ -28,14 +28,16 @@ def execute(c,shots=1024,get='counts'):
   def s(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
   def t(x,y,T):
-    T=T/2
-    return [x[0]*cos(T)+y[1]*sin(T),x[1]*cos(T)-y[0]*sin(T)],[y[0]*cos(T)+x[1]*sin(T),y[1]*cos(T)-x[0]*sin(T)]
+    return [x[0]*cos(T/2)+y[1]*sin(T/2),x[1]*cos(T/2)-y[0]*sin(T/2)],[y[0]*cos(T/2)+x[1]*sin(T/2),y[1]*cos(T)-x[0]*sin(T/2)]
   g =(get=='memory')-(get=='statevector')
   k = [[0,0] for _ in range(2**c.n)]
   k[0] = [1.0,0.0]
   for gate in c.data:
     if gate[0]=='init':
-      k = [e for e in gate[1]]
+      if type(gate[1][0])!=list:
+        k = [[e,0] for e in gate[1]]
+      else:
+        k = [e for e in gate[1]]
     elif gate[0]=='x':
       if c.n==1 and gate[1]==0:
         k[0],k[1]=k[1],k[0]
@@ -73,8 +75,7 @@ def execute(c,shots=1024,get='counts'):
     return k
   else:
     if c.n==1:
-      assert(('m',0,0)==c.data[-1])
-      assert(('m',0,0) not in c.data[:-1])
+      assert((('m',0,0)==c.data[-1]) and (('m',0,0) not in c.data[:-1]))
     else:
       assert((('m',0,0)in c.data) and (('m',1,1) in c.data))
       m = [False,False]
