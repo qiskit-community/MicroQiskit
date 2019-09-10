@@ -1,3 +1,4 @@
+print('This is Aether: the MicroPython version of Qiskit. For the full version, see qiskit.org.\nIt has many more features, and access to real quantum computers.')
 import random
 from math import cos,sin,pi
 r2=0.70710678118
@@ -28,7 +29,7 @@ def execute(c,shots=1024,get='counts'):
   def s(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
   def t(x,y,T):
-    return [x[0]*cos(T/2)+y[1]*sin(T/2),x[1]*cos(T/2)-y[0]*sin(T/2)],[y[0]*cos(T/2)+x[1]*sin(T/2),y[1]*cos(T)-x[0]*sin(T/2)]
+    return [x[0]*cos(T/2)+y[1]*sin(T/2),x[1]*cos(T/2)-y[0]*sin(T/2)],[y[0]*cos(T/2)+x[1]*sin(T/2),y[1]*cos(T/2)-x[0]*sin(T/2)]
   g =(get=='memory')-(get=='statevector')
   k = [[0,0] for _ in range(2**c.n)]
   k[0] = [1.0,0.0]
