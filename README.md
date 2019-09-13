@@ -26,7 +26,7 @@ Then we can extract the actual results. The most common way to do this is with a
 
 This multi-stage process allows for the many possible ways of running circuits and extracting results in Qiskit. But in Aether, there is only one way to run the circuit: using Aether's built in simulator. This allows for a simpler syntax.
 
-    counts = execute(qc,shots,get='counts')        # Aether
+    counts = simulate(qc,shots,get='counts')        # Aether
     
 It is also possible to extract the memory and statevector with `get='memory'` and `get='statevector'`, respectively. Note that complex numbers $a + i b$ in the latter are represented by the list `[a,b]` in Aether, rather than `a + bj` as in Qiskit.
     
