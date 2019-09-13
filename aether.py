@@ -25,7 +25,7 @@ class QuantumCircuit:
   def measure(c,q,b):
     assert(b<c.m)
     c.data.append(('m',q,b))
-def execute(c,shots=1024,get='counts'):
+def simulate(c,shots=1024,get='counts'):
   def s(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
   def t(x,y,T):
