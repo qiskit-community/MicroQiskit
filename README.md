@@ -1,4 +1,4 @@
-# Aether - Quantum for Microcontrollers
+# MicroQiskit - Quantum for Microcontrollers
 
 Microcontrollers are a popular platform for hobbyist and educational programming. Quantum computation is an emerging technology that also promises to be great for these purposes. So let's combine them!
 
@@ -6,9 +6,9 @@ The best way to do quantum computing is with [Qiskit](https://github.com/qiskit/
 
 There are many ways to try solving this problem. For example, if you can use the internet with your microcontroller, you could delegate all the tricky bits to the cloud.
 
-In this repository, there is an alternative option: Aether. This is the heart of Qiskit, reborn in less than 100 lines of code. With Aether, you can create and simulate simple quantum circuits to add a quantum flavour to your microcontroller project.
+In this repository, there is an alternative option: MicroQiskit. This is the heart of Qiskit, reborn in less than 3KB. With MicroQiskit, you can create and simulate simple quantum circuits to add a quantum flavour to your microcontroller project.
 
-Aether is written to be as compatible with Qiskit as possible. Learning quantum programming with Aether is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://github.com/Qiskit/qiskit-tutorials) is a great way to get started with Aether. The main differences are detailed below.
+MicroQiskit is written to be as compatible with Qiskit as possible. Learning quantum programming with MicroQiskit is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://community.qiskit.org/textbook) is a great way to get started with MicroQiskit. The main differences are detailed below.
 
 ### Running a circuit
 
@@ -24,12 +24,12 @@ Then we can extract the actual results. The most common way to do this is with a
 
     counts = results.get_counts()     # Qiskit
 
-This multi-stage process allows for the many possible ways of running circuits and extracting results in Qiskit. But in Aether, there is only one way to run the circuit: using Aether's built in simulator. This allows for a simpler syntax.
+This multi-stage process allows for the many possible ways of running circuits and extracting results in Qiskit. But in MicroQiskit, there is only one way to run the circuit: using MicroQiskit's built in simulator. This allows for a simpler syntax.
 
-    counts = simulate(qc,shots,get='counts')        # Aether
+    counts = simulate(qc,shots,get='counts')        # MicroQiskit
     
-It is also possible to extract the memory and statevector with `get='memory'` and `get='statevector'`, respectively. Note that complex numbers $a + i b$ in the latter are represented by the list `[a,b]` in Aether, rather than `a + bj` as in Qiskit.
+It is also possible to extract the memory and statevector with `get='memory'` and `get='statevector'`, respectively. Note that complex numbers $a + i b$ in the latter are represented by the list `[a,b]` in MicroQiskit, rather than `a + bj` as in Qiskit.
     
 ### Available gates
 
-Quantum gates are added to circuits in Aether in the same way as in Qiskit. The main difference is that the set of available gates in Aether is limited to `x`, `cx`, `rx`, and `h`. All others can be created if and when required from this basic set.
+Quantum gates are added to circuits in MicroQiskit in the same way as in Qiskit. The main difference is that the set of available gates in MicroQiskit is limited to `x`, `cx`, `rx`, and `h`. All others can be created if and when required from this basic set.

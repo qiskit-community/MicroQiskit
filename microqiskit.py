@@ -1,4 +1,5 @@
-print('This is Aether: the MicroPython version of Qiskit. For the full version, see qiskit.org.\nIt has many more features, and access to real quantum computers.')
+# This is the MicroPython version of Qiskit. For the full version, see qiskit.org.
+# It has many more features, and access to real quantum computers.
 import random
 from math import cos,sin,pi
 r2=0.70710678118
