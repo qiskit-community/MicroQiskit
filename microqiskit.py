@@ -24,7 +24,7 @@ class QuantumCircuit:
   def cx(c,s,t):
     c.data.append(('cx',t))
   def measure(c,q,b):
-    assert(b<c.m)
+    assert b<c.m, 'Index for output bit out of range.'
     c.data.append(('m',q,b))
 def simulate(c,shots=1024,get='counts'):
   def s(x,y):
@@ -77,13 +77,13 @@ def simulate(c,shots=1024,get='counts'):
     return k
   else:
     if c.n==1:
-      assert((('m',0,0)==c.data[-1]) and (('m',0,0) not in c.data[:-1]))
+      assert (('m',0,0)==c.data[-1]) and (('m',0,0) not in c.data[:-1]), 'Incorrect or missing measure command.'
     else:
-      assert((('m',0,0)in c.data) and (('m',1,1) in c.data))
+      assert (('m',0,0)in c.data) and (('m',1,1) in c.data), 'Incorrect or missing measure command.'
       m = [False,False]
       for gate in c.data:
         for j in range(2):
-          assert( not ((gate[-1]==j) and m[j]) )
+          assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
           m[j] = (gate==('m',j,j))
     ps=[e[0]**2+e[1]**2 for e in k]
     if g==0:
