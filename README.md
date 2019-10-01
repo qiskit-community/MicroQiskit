@@ -15,6 +15,7 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 * The main differences between Qiskit and MicroQiskit are detailed below.
 * Check out the docs [here](https://microqiskit.readthedocs.io/en/latest/#).
 * For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/PewPew-Qubit.ipynb).
+* Get inspiration for what you could do [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/index.ipynb).
 
 ## Differences with Qiskit
 
