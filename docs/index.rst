@@ -1,15 +1,16 @@
 MicroQiskit Library Reference
 *****************************
 
-A version of `Qiskit <https://qiskit.org`_ made for microcontrollers and for educational purposes.
+A version of Qiskit made for microcontrollers and for educational purposes.
+See https://qiskit.org for more on Qiskit.
 
 .. module:: microqiskit
 
+.. function:: simulate(qc,shots=1024,get='counts'):
 
-.. function:: simulate(level)
-
-    Set the brightness of the display, from 0 (minimum) to 15 (maximum). On
-    devices that don't support varying the brightness this does nothing.
+    Runs the quantum circuit ``qc``. Results are given from multiple runs, the
+    number of which is specified by ``shots``. The type of output is specified
+    by ``get``, which can be set to ``'counts'``, ``'memory'`` or ``'statevector'``.
     
     This is the MicroQiskit equivalent of the ``execute`` function in Qiskit.
 
