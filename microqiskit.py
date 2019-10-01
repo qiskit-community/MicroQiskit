@@ -20,9 +20,9 @@ class QuantumCircuit:
   def rx(c,T,q):
     c.data.append(('r',T,q))
   def rz(c,T,q):
-    c.data.append(('h',T,q))
+    c.data.append(('h',q))
     c.data.append(('r',T,q))
-    c.data.append(('h',T,q))
+    c.data.append(('h',q))
   def h(c,q):
     c.data.append(('h',q))
   def cx(c,s,t):
