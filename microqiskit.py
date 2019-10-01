@@ -23,6 +23,12 @@ class QuantumCircuit:
     c.data.append(('h',q))
     c.data.append(('r',T,q))
     c.data.append(('h',q))
+  def ry(c,T,q):
+    c.data.append(('r',pi/2,q))
+    c.data.append(('h',q))
+    c.data.append(('r',T,q))
+    c.data.append(('h',q))
+    c.data.append(('r',-pi/2,q))
   def h(c,q):
     c.data.append(('h',q))
   def cx(c,s,t):
