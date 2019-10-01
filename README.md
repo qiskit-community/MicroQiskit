@@ -6,9 +6,17 @@ The best way to do quantum computing is with [Qiskit](https://github.com/qiskit/
 
 There are many ways to try solving this problem. For example, if you can use the internet with your microcontroller, you could delegate all the tricky bits to the cloud.
 
-In this repository, there is an alternative option: MicroQiskit. This is the heart of Qiskit, reborn in less than 3KB. With MicroQiskit, you can create and simulate simple quantum circuits to add a quantum flavour to your microcontroller project.
+In this repository, there is an alternative option: MicroQiskit. This is the heart of Qiskit, reborn in around 100 lines of code. With MicroQiskit, you can create and simulate simple quantum circuits to add a quantum flavour to your microcontroller project.
 
-MicroQiskit is written to be as compatible with Qiskit as possible. Learning quantum programming with MicroQiskit is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://community.qiskit.org/textbook) is a great way to get started with MicroQiskit. The main differences are detailed below.
+MicroQiskit is written to be as compatible with Qiskit as possible. Learning quantum programming with MicroQiskit is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://community.qiskit.org/textbook) is a great way to get started with MicroQiskit.
+
+## Learn more
+
+* The main differences between Qiskit and MicroQiskit are detailed below.
+* Check out the docs [here](https://microqiskit.readthedocs.io/en/latest/#).
+* For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/PewPew-Qubit.ipynb).
+
+## Differences with Qiskit
 
 ### Running a circuit
 
@@ -32,4 +40,4 @@ It is also possible to extract the memory and statevector with `get='memory'` an
     
 ### Available gates
 
-Quantum gates are added to circuits in MicroQiskit in the same way as in Qiskit. The main difference is that the set of available gates in MicroQiskit is limited to `x`, `cx`, `rx`, and `h`. All others can be created if and when required from this basic set.
+Quantum gates are added to circuits in MicroQiskit in the same way as in Qiskit. The main difference is that the set of available gates in MicroQiskit is limited to `x`, `h`, `cx`, `rx`, `ry` and `rz`. All others can be created if and when required from this basic set.
