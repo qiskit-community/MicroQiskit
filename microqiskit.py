@@ -18,24 +18,29 @@ class QuantumCircuit:
   def x(c,q):
     c.data.append(('x',q))
   def rx(c,T,q):
-    c.data.append(('r',T,q))
-  def rz(c,T,q):
-    c.data.append(('h',q))
-    c.data.append(('r',T,q))
-    c.data.append(('h',q))
-  def ry(c,T,q):
-    c.data.append(('r',pi/2,q))
-    c.data.append(('h',q))
-    c.data.append(('r',T,q))
-    c.data.append(('h',q))
-    c.data.append(('r',-pi/2,q))
+    c.data.append(('rx',T,q))
   def h(c,q):
     c.data.append(('h',q))
   def cx(c,s,t):
-    c.data.append(('cx',t))
+    c.data.append(('cx',s,t))
   def measure(c,q,b):
     assert b<c.m, 'Index for output bit out of range.'
     c.data.append(('m',q,b))
+  def rz(c,T,q):
+    c.data.append(('h',q))
+    c.data.append(('rx',T,q))
+    c.data.append(('h',q))
+  def ry(c,T,q):
+    c.data.append(('rx',pi/2,q))
+    c.data.append(('h',q))
+    c.data.append(('rx',T,q))
+    c.data.append(('h',q))
+    c.data.append(('rx',-pi/2,q))
+  def z(c,q):
+    c.rz(pi,q)
+  def y(c,q):
+    c.rz(pi,q)
+    c.data.append(('x',q))
 def simulate(c,shots=1024,get='counts'):
   def s(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
@@ -50,54 +55,44 @@ def simulate(c,shots=1024,get='counts'):
         k = [[e,0] for e in gate[1]]
       else:
         k = [e for e in gate[1]]
-    elif gate[0]=='x':
-      if c.n==1 and gate[1]==0:
-        k[0],k[1]=k[1],k[0]
-      elif gate[1]==0:
-        k[0],k[1]=k[1],k[0]
-        k[2],k[3]=k[3],k[2]
+    elif gate[0] in ['x','h','rx']:
+      if gate[0]=='rx':
+        j = gate[2]
       else:
-        k[0],k[2]=k[2],k[0]
-        k[1],k[3]=k[3],k[1]
-    elif gate[0]=='h':
-      if c.n==1 and gate[1]==0:
-        k[0],k[1]=s(k[0],k[1])
-      elif gate[1]==0:
-        k[0],k[1]=s(k[0],k[1])
-        k[2],k[3]=s(k[2],k[3])
-      else:
-        k[0],k[2]=s(k[0],k[2])
-        k[1],k[3]=s(k[1],k[3])
-    elif gate[0]=='r':
-      T=gate[1]
-      if c.n==1 and gate[2]==0:
-        k[0],k[1]=t(k[0],k[1],T)
-      elif gate[2]==0:
-        k[0],k[1]=t(k[0],k[1],T)
-        k[2],k[3]=t(k[2],k[3],T)
-      else:
-        k[0],k[2]=t(k[0],k[2],T)
-        k[1],k[3]=t(k[1],k[3],T)
+        j = gate[1]
+      for i0 in range(2**j):
+        for i1 in range(2**(c.n-j-1)):
+          b0=i0+2**(j+1)*i1
+          b1=b0+2**j
+          if gate[0]=='x':
+            k[b0],k[b1]=k[b1],k[b0]
+          elif gate[0]=='h':
+            k[b0],k[b1]=s(k[b0],k[b1])
+          else:
+            k[b0],k[b1]=t(k[b0],k[b1],gate[1])
     elif gate[0]=='cx':
-      if gate[1]==1:
-        k[1],k[3]=k[3],k[1]
-      else:
-        k[2],k[3]=k[3],k[2]
+      l = min(gate[1],gate[2])
+      h = max(gate[2],gate[1])
+      for i0 in range(2**l):
+        for i1 in range(2**(h-l-1)):
+          for i2 in range(2**(c.n-h-1)):
+            b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**gate[1]
+            b1=b0+2**gate[2]
+            k[b0],k[b1]=k[b1],k[b0]
   if g==-1:
     return k
   else:
-    if c.n==1:
-      assert (('m',0,0)==c.data[-1]) and (('m',0,0) not in c.data[:-1]), 'Incorrect or missing measure command.'
-    else:
-      assert (('m',0,0)in c.data) and (('m',1,1) in c.data), 'Incorrect or missing measure command.'
-      m = [False,False]
-      for gate in c.data:
-        for j in range(2):
-          assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
-          m[j] = (gate==('m',j,j))
+    for j in range(c.n):
+      assert (('m',j,j)in c.data), 'Incorrect or missing measure command.'
+    m = [False for _ in range(c.n)]
+    for gate in c.data:
+      for j in range(c.n):
+        assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
+        m[j] = (gate==('m',j,j))
     ps=[e[0]**2+e[1]**2 for e in k]
     if g==0:
-      return {('{0:0'+str(c.n)+'b}').format(j):int(p*shots) for j,p in enumerate(ps)}
+      assert shots>=4**c.n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
+      return {('{0:0'+str(c.n)+'b}').format(j):p*shots for j,p in enumerate(ps)}
     else:
       m=[]
       for _ in range(shots):
