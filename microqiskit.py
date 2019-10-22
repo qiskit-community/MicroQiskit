@@ -23,8 +23,6 @@ class QuantumCircuit:
     c.data.append(('h',q))
   def cx(c,s,t):
     c.data.append(('cx',s,t))
-  def ccx(c,s0,s1,t):
-    c.data.append(('ccx',s0,s1,t))
   def measure(c,q,b):
     assert b<c.m, 'Index for output bit out of range.'
     c.data.append(('m',q,b))
