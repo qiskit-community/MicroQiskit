@@ -20,8 +20,8 @@ For microcontroller devices using CircuitPython, you can alternatively use the c
 
 * The main differences between Qiskit and MicroQiskit are detailed below.
 * Check out [the docs](https://microqiskit.readthedocs.io/en/latest/#).
-* For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/PewPew-Qubit.ipynb).
-* Get inspiration for what you could do [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/index.ipynb).
+* For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/tutorials/PewPew-Qubit.ipynb).
+* Get inspiration for what you could do [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/tutorials/index.ipynb).
 
 ## Differences with Qiskit
 
