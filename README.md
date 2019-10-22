@@ -13,7 +13,7 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 ## Learn more
 
 * The main differences between Qiskit and MicroQiskit are detailed below.
-* Check out the docs [here](https://microqiskit.readthedocs.io/en/latest/#).
+* Check out [the docs](https://microqiskit.readthedocs.io/en/latest/#).
 * For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/PewPew-Qubit.ipynb).
 * Get inspiration for what you could do [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/index.ipynb).
 
@@ -37,7 +37,9 @@ This multi-stage process allows for the many possible ways of running circuits a
 
     counts = simulate(qc,shots,get='counts')        # MicroQiskit
     
-It is also possible to extract the memory and statevector with `get='memory'` and `get='statevector'`, respectively. Note that complex numbers $a + i b$ in the latter are represented by the list `[a,b]` in MicroQiskit, rather than `a + bj` as in Qiskit.
+It is also possible to extract the memory and statevector with `get='memory'` and `get='statevector'`, respectively.
+
+See [the docs](https://microqiskit.readthedocs.io/en/latest/#) for more details.
     
 ### Available gates
 
