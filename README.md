@@ -43,4 +43,4 @@ See [the docs](https://microqiskit.readthedocs.io/en/latest/#) for more details.
     
 ### Available gates
 
-Quantum gates are added to circuits in MicroQiskit in the same way as in Qiskit. The main difference is that the set of available gates in MicroQiskit is limited to `x`, `h`, `cx`, `rx`, `ry` and `rz`. All others can be created if and when required from this basic set.
+Quantum gates are added to circuits in MicroQiskit in the same way as in Qiskit. The main difference is that the set of available gates in MicroQiskit is limited to `x`, `y`, `z`, `h`, `cx`, `rx`, `ry` and `rz`. All others can be created if and when required from this basic set.
