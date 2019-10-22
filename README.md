@@ -10,6 +10,12 @@ In this repository, there is an alternative option: MicroQiskit. This is the hea
 
 MicroQiskit is written to be as compatible with Qiskit as possible. Learning quantum programming with MicroQiskit is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://community.qiskit.org/textbook) is a great way to get started with MicroQiskit.
 
+## Installing MicroQiskit
+
+Dowloading a single file is all that is needed, so the work 'installation' is perhaps overkill. All you need to do is take the [microqiskit.py](microqiskit.py) file, and place somewhere that it can be found by Python when importing. The easiest option is simply to put it in the same folder as any Python scripts that will use it.
+
+For microcontroller devices using CircuitPython, you can alternatively use the compiled version: [microqiskit.mpy](microqiskit.mpy). The package is still imported in Python as usual.
+
 ## Learn more
 
 * The main differences between Qiskit and MicroQiskit are detailed below.
