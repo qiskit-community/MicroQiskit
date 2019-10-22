@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from microqiskit import *
 
 shots = int(1e6)
