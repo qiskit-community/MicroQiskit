@@ -23,6 +23,8 @@ class QuantumCircuit:
     c.data.append(('h',q))
   def cx(c,s,t):
     c.data.append(('cx',s,t))
+  def ccx(c,s0,s1,t):
+    c.data.append(('ccx',s0,s1,t))
   def measure(c,q,b):
     assert b<c.m, 'Index for output bit out of range.'
     c.data.append(('m',q,b))
@@ -71,8 +73,7 @@ def simulate(c,shots=1024,get='counts'):
           else:
             k[b0],k[b1]=t(k[b0],k[b1],gate[1])
     elif gate[0]=='cx':
-      l = min(gate[1],gate[2])
-      h = max(gate[2],gate[1])
+      [l,h] = sorted(gate[1:])
       for i0 in range(2**l):
         for i1 in range(2**(h-l-1)):
           for i2 in range(2**(c.n-h-1)):
