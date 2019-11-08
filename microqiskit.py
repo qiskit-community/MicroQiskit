@@ -92,10 +92,6 @@ def simulate(qc,shots=1024,get='counts'):
     '''For two elements of the statevector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   
-   # This is just a shorthand allowing less characters to be used.
-   # It gives g=1 for a memory output, g=-1 for statevector, and g=0 for counts.
-  g = (get=='memory')-(get=='statevector') 
-  
   # Initialize a 2^n element statevector. Complex numbers are expressed as a list of two real numbers.
   k = [[0,0] for _ in range(2**qc._n)] # First with zeros everywhere.
   k[0] = [1.0,0.0] # Then a single 1 to create the all |0> state.
