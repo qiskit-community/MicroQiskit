@@ -14,14 +14,12 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 
 Dowloading a single file is all that is needed, so the word 'installation' is perhaps overkill. All you need to do is take the [microqiskit.py](other_versions/microqiskit.py) file, and place somewhere that it can be found by Python when importing. The easiest option is simply to put it in the same folder as any Python scripts that will use it.
 
-For microcontroller devices using CircuitPython, you can alternatively use the compiled version: [other_versions/microqiskit.mpy](microqiskit.mpy). The package is still imported as usual.
 
 ## Learn more
 
 * The main differences between Qiskit and MicroQiskit are detailed below.
 * Check out [the docs](https://microqiskit.readthedocs.io/en/latest/#).
-* For a tutorial on what qubits are and how to play with them using MicroQiskit, see [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/tutorials/PewPew-Qubit.ipynb).
-* Get inspiration for what you could do [here](https://nbviewer.jupyter.org/github/quantumjim/MicroQiskit/blob/master/tutorials/index.ipynb).
+
 
 ## Differences with Qiskit
 
