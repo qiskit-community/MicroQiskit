@@ -139,8 +139,8 @@ def simulate(qc,shots=1024,get='counts'):
       for i0 in range(2**l):
         for i1 in range(2**(h-l-1)):
           for i2 in range(2**(qc._n-h-1)):
-            b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**gate[1] # Index corresponding to bit string for which digit `s` is `1` and digit `t` is '0'.
-            b1=b0+2**gate[2]  # Index corresponding to the same bit string except that digit `t` is '1'.
+            b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**s # Index corresponding to bit string for which digit `s` is `1` and digit `t` is '0'.
+            b1=b0+2**t  # Index corresponding to the same bit string except that digit `t` is '1'.
             k[b0],k[b1]=k[b1],k[b0] # Flip the values.
   
   # Now for the outputs.

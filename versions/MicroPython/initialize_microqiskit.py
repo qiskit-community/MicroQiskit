@@ -1,5 +1,29 @@
-import sys
-sys.path.append('..')
+# First we strip comments and blank lines from the top-level version of MicroQiskit.py 
+
+f = open("../../microqiskit.py", "r")
+file = f.read().split('\n')
+f.close()
+
+for j,line in enumerate(file):
+    file[j] = line.split("#")[0]
+    if line.count("'''")==2:
+        file[j] = line.split("'''")[0]
+        
+new_file = []
+for j,line in enumerate(file):
+    if (line!='') and (not line.isspace()):
+        new_file.append(line)
+        
+new_file = '\n'.join(new_file)
+
+f = open("microqiskit.py", "w")
+f.write( new_file )
+f.close()
+
+print('Comments removed from top-level version of MicroQiskit.py.')
+
+# Then we test to see if it works!
+
 from microqiskit import *
 
 shots = int(1e6)
@@ -67,7 +91,7 @@ def test_memory():
     assert( len(m)==shots )
     p00 = 0
     for out in m:
-      p00 +=(out=='00')/shots
+      p00 += round(out=='00')/shots
     assert( round(p00,2)==0.25 )
     qc = QuantumCircuit(1,1)
     qc.h(0)
@@ -76,7 +100,7 @@ def test_memory():
     assert( len(m)==shots )
     p0 = 0
     for out in m:
-      p0 +=(out=='0')/shots
+      p0 += round(out=='0')/shots
     assert( round(p0,1)==0.5 )
 
 def test_counts():
@@ -100,7 +124,7 @@ def test_add():
         c = simulate(qc+meas,shots=shots,get='counts')
         for out in c:
             p = c[out]/shots
-            assert( round(p,2)==round(1/2**n,2) )
+            assert( round(p,2)==round(1.0/2**n,2) )
     
 def test_multiqubit():
     qc = QuantumCircuit(7,7)
@@ -134,3 +158,5 @@ test_memory()
 test_counts()
 test_add()
 test_multiqubit()
+
+print('Tests passed!')
