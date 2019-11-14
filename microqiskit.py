@@ -169,6 +169,9 @@ def simulate(qc,shots=1024,get='counts'):
       # This differs from Qiskit, in which the counts values are sampled from a random process.
       # For large values of `shots`, the results will be mostly equivalent for most common use cases.
       # An error is therefore raised if the given shots value is too low.
+      # Note that this is done only for the benefit of microcontrollers.
+      # Ports should contruct the counts dictionary by getting and analysing a memory output.
+      # See the C++ port for an example.
       assert shots>=4**qc._n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
       # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
       return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
@@ -189,3 +192,7 @@ def simulate(qc,shots=1024,get='counts'):
             m.append(out)
             un=False
       return m
+
+  # Note: Ports should also contain the possibility to get a Qiskit output, which returns a string containing a Python
+  # program to create the given circuit qc. This is not needed here, since the same syntax as standard Qiskit is used.
+  # See the C++ port for an example.
