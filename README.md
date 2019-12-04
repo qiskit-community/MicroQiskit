@@ -28,6 +28,6 @@ In Qiskit, the way circuits are run must account for the many different possible
 
 ## Versions
     
-* [MicroPython](MicroPython/README.md) - Compatible with parts of Python that Qiskit cannot reach: MicroPython, CircuitPython and Python 2.
+* [MicroPython](versions/MicroPython/README.md) - Compatible with parts of Python that Qiskit cannot reach: MicroPython, CircuitPython and Python 2.
 
-* [C++](C++/README.md) - Qiskit in a single header file.
+* [C++](versions/C++/README.md) - Qiskit in a single header file.
