@@ -5,8 +5,8 @@ Qiskit is a framework for quantum computation. The full version of is implemente
 
 This documentation is for MicroQiskit, a minimal reimplementation of Qiskit suitable for porting to other programming languages. It is intended for educational and testing purposes.
 
-:doc:`MicroPython/Python 2 <../MicroPython>` 
 
-:doc:`Lua <../lua>` 
+* :doc:`MicroPython/Python 2 <../micropython>` 
 
+* :doc:`Lua <../lua>`
 

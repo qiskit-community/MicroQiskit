@@ -13,7 +13,7 @@ See https://qiskit.org for more on Qiskit.
     by ``get``, which can be set to ``'counts'``, ``'memory'`` or ``'statevector'``.
     
     This is the MicroQiskit equivalent of the ``execute`` function in Qiskit.
-    The form of the outputs have the following differences
+    The form of the outputs have the following differences.
     
     For a ``'statevector'`` output: Complex numbers are specified as a two
     element list instead of standard Python complex number notation. So a
