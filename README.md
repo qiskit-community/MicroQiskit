@@ -12,7 +12,7 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 
 ### Documentation
 
-* [Documentation for MicroQiskit]([the docs](https://microqiskit.readthedocs.io/en/latest/#))
+* [Documentation for MicroQiskit](https://microqiskit.readthedocs.io/en/latest/#)
 * [Documentation for Qiskit](https://qiskit.org/documentation/)
 
 ### Installation
