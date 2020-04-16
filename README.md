@@ -10,7 +10,21 @@ We are now in the process of porting MicroQiskit to other languages. In this reg
 
 MicroQiskit is written to be as compatible with Qiskit as possible. Learning quantum programming with MicroQiskit is therefore a way to get started with Qiskit. And [getting to know Qiskit](https://community.qiskit.org/textbook) is a great way to get started with MicroQiskit.
 
-## Template Version
+### Documentation
+
+* [Documentation for MicroQiskit]([the docs](https://microqiskit.readthedocs.io/en/latest/#))
+* [Documentation for Qiskit](https://qiskit.org/documentation/)
+
+### Installation
+
+Installation guides for the various versions of MicroQiskit can be found in the corresponding README files.
+
+* [MicroPython/Python 2](versions/MicroPython/README.md)
+* [Lua](versions/Lua/LUA.md)
+* [C++](versions/C++/README.md)
+
+
+### Template Version
 
 The [microqiskit.py](microqiskit.py) file found in this folder is intended as a template version. It contains comments to explain how each part of MicroQiskit works, both to aid understanding and to help in the writing of ports. The MicroPython version is directly constructed from this template.
 
@@ -25,9 +39,3 @@ During simulation, or when exporting the circuit in a Python-compatible form, it
 ### Running Circuits
 
 In Qiskit, the way circuits are run must account for the many different possible backends, including various simulators as well as prototype quantum devices. In MicroQiskit, there is only one simulator. As such, the process is reduced to either a single `simulate` function or a single `Simulator` class, depending on language. These functions and classes are not present in Qiskit.
-
-## Versions
-    
-* [MicroPython](MicroPython/README.md) - Compatible with parts of Python that Qiskit cannot reach: MicroPython, CircuitPython and Python 2.
-
-* [C++](/versions/C++/README.md) - Qiskit in a single header file.
