@@ -172,6 +172,8 @@ def simulate(qc,shots=1024,get='counts'):
       # Note that this is done only for the benefit of microcontrollers.
       # Ports should contruct the counts dictionary by getting and analysing a memory output.
       # See the C++ port for an example.
+      # Counts produced in the way used here can be implemented as an additional 'fast counts' option.
+      # See the Lua port for an example.
       assert shots>=4**qc._n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
       # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
       return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
