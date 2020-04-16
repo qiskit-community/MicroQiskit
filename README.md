@@ -20,7 +20,7 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 Installation guides for the various versions of MicroQiskit can be found in the corresponding README files.
 
 * [MicroPython/Python 2](versions/MicroPython/README.md)
-* [Lua](versions/Lua/LUA.md)
+* [Lua](versions/Lua/README.md)
 * [C++](versions/C++/README.md)
 
 
