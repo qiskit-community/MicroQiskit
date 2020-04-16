@@ -8,8 +8,6 @@ See https://qiskit.org for more on Qiskit.
 
 .. function:: simulate(qc,get,counts):
 
-shots=1024,get='counts'):
-
     This is the MicroQiskit equivalent of the ``execute`` function in Qiskit.
 
     Runs the quantum circuit ``qc``. Results are given from multiple runs, the
