@@ -4,7 +4,6 @@ MicroQiskit Library Reference
 A version of Qiskit made for educational purposes.
 See https://qiskit.org for more on Qiskit.
 
-.. module:: microqiskit
 
 .. function:: simulate(qc,get,counts):
 
