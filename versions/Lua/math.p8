@@ -21,3 +21,5 @@ end
 function math.randomseed(time)
 end
 os = {}
+function os.time()
+end
