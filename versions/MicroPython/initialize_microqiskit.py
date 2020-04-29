@@ -152,6 +152,48 @@ def test_multiqubit():
             check = check and round(p,2)==0.25
         assert( check )
 
+def test_multiqubit():
+    qc = QuantumCircuit(7,7)
+    qc.h(0)
+    qc.cx(0,2)
+    qc.cx(2,1)
+    qc.h(5)
+    qc.cx(5,3)
+    qc.cx(3,4)
+    qc.cx(3,6)
+    ket = simulate(qc,get='statevector')
+    check = True
+    for string in ['0000000','0000111','1111000','1111111']:
+        check = check and round(ket[int(string,2)][0],2)==0.50
+    assert( check )
+    for j in range(7):
+        qc.measure(j,j)
+    for get in ['counts','expected_counts']:
+        counts  = simulate(qc,shots=shots,get='counts')
+        check = True
+        for string in ['0000000','0000111','1111000','1111111']:
+            p = counts[string]/shots
+            check = check and round(p,2)==0.25
+        assert( check )
+        
+def test_reorder ():
+    qc = QuantumCircuit(2,2)
+    qc.x(0)
+    qc.measure(0,1)
+    qc.measure(1,0)
+    counts = simulate(qc,shots=shots,get='counts')
+    assert counts['01']==shots
+    qc = QuantumCircuit(5,4)
+    qc.x(1)
+    qc.x(3)
+    qc.x(4)
+    qc.measure(1,0)
+    qc.measure(3,1)
+    qc.measure(4,2)
+    qc.measure(0,3)
+    counts = simulate(qc,shots=shots,get='counts')
+    assert counts['0111']==shots
+        
 test_trig()
 test_x()
 test_h()

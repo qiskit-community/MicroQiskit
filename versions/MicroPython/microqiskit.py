@@ -3,7 +3,6 @@ from math import cos,sin,pi
 r2=0.70710678118 
 class QuantumCircuit:
   def __init__(self,n,m=0):
-    assert (n==m or m==0), 'The number of qubits and outputs must be equal in MicroQiskit.'
     self._n=n
     self._m=m
     self.data=[]
@@ -24,6 +23,7 @@ class QuantumCircuit:
     self.data.append(('cx',s,t))
   def measure(self,q,b):
     assert b<self._m, 'Index for output bit out of range.'
+    assert q<self._n, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
   def rz(self,theta,q):
     self.data.append(('h',q))
@@ -47,12 +47,15 @@ def simulate(qc,shots=1024,get='counts'):
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   k = [[0,0] for _ in range(2**qc._n)] 
   k[0] = [1.0,0.0] 
+  output_map = {}
   for gate in qc.data:
     if gate[0]=='init': 
       if type(gate[1][0])==list:
         k = [e for e in gate[1]]
       else: 
         k = [[e,0] for e in gate[1]]
+    elif gate[0]=='m':
+      output_map[gate[2]] = gate[1]
     elif gate[0] in ['x','h','rx']: 
       j = gate[-1] 
       for i0 in range(2**j):
@@ -78,8 +81,6 @@ def simulate(qc,shots=1024,get='counts'):
   if get=='statevector':
     return k
   else:
-    for j in range(qc._n):
-      assert (('m',j,j) in qc.data), 'Incorrect or missing measure command.'
     m = [False for _ in range(qc._n)]
     for gate in qc.data:
       for j in range(qc._n):
@@ -94,8 +95,12 @@ def simulate(qc,shots=1024,get='counts'):
         r=random.random()
         for j,p in enumerate(probs):
           cumu += p
-          if r<cumu and un:
-            out=('{0:0'+str(qc._n)+'b}').format(j)
+          if r<cumu and un:    
+            raw_out=('{0:0'+str(qc._n)+'b}').format(j)
+            out_list = ['0']*qc._m
+            for bit in output_map:
+              out_list[qc._m-1-bit] = raw_out[qc._n-1-output_map[bit]]
+            out = ''.join(out_list)
             m.append(out)
             un=False
       if get=='memory':

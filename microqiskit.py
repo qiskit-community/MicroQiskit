@@ -10,9 +10,6 @@ class QuantumCircuit:
   
   def __init__(self,n,m=0):
     '''Defines and initializes the attributes'''
-    # The number of qubits and number of output bits must be equal in any circuit with `measure` gates.
-    # This is a MicroQiskit only requirement, and so an `assert` statement is used to warn Qiskit users.
-    assert (n==m or m==0), 'The number of qubits and outputs must be equal in MicroQiskit.'
     # Number of qubits `n` and number of output bits `m` are attributes of QuantumCircuit objects in MicroQiskit, but not in Qiskit.
     # For this reason, the initial _ is used.
     self._n=n
@@ -51,6 +48,7 @@ class QuantumCircuit:
   def measure(self,q,b):
     '''Applies an measure gate to the given qubit and bit.'''
     assert b<self._m, 'Index for output bit out of range.'
+    assert q<self._n, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
   
   def rz(self,theta,q):
@@ -96,6 +94,9 @@ def simulate(qc,shots=1024,get='counts'):
   k = [[0,0] for _ in range(2**qc._n)] # First with zeros everywhere.
   k[0] = [1.0,0.0] # Then a single 1 to create the all |0> state.
 
+  # The `output_map` dictionary keeps track of which qubits are read out to which output bits
+  output_map = {}
+
   # Now we go through the gates and apply them to the statevector.
   # Each gate is specified by a tuple, as defined in the QuantumCircuit class
   for gate in qc.data:
@@ -105,6 +106,10 @@ def simulate(qc,shots=1024,get='counts'):
         k = [e for e in gate[1]]
       else: # This allows for simple lists of real numbers to be accepted as input.
         k = [[e,0] for e in gate[1]]
+        
+    elif gate[0]=='m':
+
+      output_map[gate[2]] = gate[1]
     
     elif gate[0] in ['x','h','rx']: # These are the only single qubit gates recognized by the simulator.
       
@@ -153,10 +158,7 @@ def simulate(qc,shots=1024,get='counts'):
 
     # Other kinds of output involve measurements.
     # The following block is to raise errors when the user does things regarding measurements that are allowed in Qiskit but not in MicroQiskit.
-    # First we demand that all measure gates are of the form `measure(j,j)`, and that there is one for each qubit.
-    for j in range(qc._n):
-      assert (('m',j,j) in qc.data), 'Incorrect or missing measure command.'
-    # Then we demand that no gates are applied to a qubit after its measure command.
+    # We demand that no gates are applied to a qubit after its measure command.
     m = [False for _ in range(qc._n)]
     for gate in qc.data:
       for j in range(qc._n):
@@ -178,9 +180,15 @@ def simulate(qc,shots=1024,get='counts'):
         r=random.random()
         for j,p in enumerate(probs):
           cumu += p
-          if r<cumu and un:
-            # When the `j`th element is chosen, the output is the n bit representation of j.
-            out=('{0:0'+str(qc._n)+'b}').format(j)
+          if r<cumu and un:    
+            # When the `j`th element is chosen, get the n bit representation of j.
+            raw_out=('{0:0'+str(qc._n)+'b}').format(j)
+            # Convert this into an m bit string, with the order specified by the measure commands
+            out_list = ['0']*qc._m
+            for bit in output_map:
+              out_list[qc._m-1-bit] = raw_out[qc._n-1-output_map[bit]]
+            out = ''.join(out_list)
+            # Add this to the list of samples
             m.append(out)
             un=False
             
