@@ -80,7 +80,7 @@ for string, counts in pairs(result3) do
 end
 
 print("\nWe can also get the expectation value of the counts\n")
-result3b = simulate(qc3,"fast counts")
+result3b = simulate(qc3,"expected_counts")
 for string, counts in pairs(result3b) do
   print("Counts for",string,"=",counts)
 end

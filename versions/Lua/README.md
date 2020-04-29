@@ -8,6 +8,8 @@ Dowloading a single file is all that is needed, so the word 'installation' is pe
 
 If using the PICO-8, you will also need the contents of [math.p8](math.p8). This provides a minimal math table required by MicroQiskit.
 
+An example of MicroQiskit Lua in use can be seen in [main.lua](main.lua).
+
 ### Documentation
 
 * [Documentation for MicroQiskit](https://microqiskit.readthedocs.io/en/latest/lua.html)

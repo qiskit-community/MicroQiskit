@@ -202,7 +202,7 @@ function simulate (qc, get, shots)
       probs[j] = amp[1]^2 + amp[2]^2
     end
 
-    if get=="fast counts" then
+    if get=="expected_counts" then
 
       c = {}
       for j,p in pairs(probs) do
