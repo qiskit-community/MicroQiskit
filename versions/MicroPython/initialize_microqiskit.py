@@ -109,10 +109,11 @@ def test_counts():
     qc.h(1)
     qc.measure(0,0)
     qc.measure(1,1)
-    c = simulate(qc,shots=shots,get='counts')
-    for out in c:
-      p = c[out]/shots
-      assert( round(p,2)==0.25 )
+    for get in ['counts','expected_counts']:
+        c = simulate(qc,shots=shots,get='counts')
+        for out in c:
+          p = c[out]/shots
+          assert( round(p,2)==0.25 )
         
 def test_add():
     for n in [1,2]:
@@ -121,10 +122,11 @@ def test_add():
         for j in range(n):
             qc.h(j)
             meas.measure(j,j)
-        c = simulate(qc+meas,shots=shots,get='counts')
-        for out in c:
-            p = c[out]/shots
-            assert( round(p,2)==round(1.0/2**n,2) )
+        for get in ['counts','expected_counts']:
+            c = simulate(qc+meas,shots=shots,get=get)
+            for out in c:
+                p = c[out]/shots
+                assert( round(p,2)==round(1.0/2**n,2) )
     
 def test_multiqubit():
     qc = QuantumCircuit(7,7)
@@ -142,12 +144,13 @@ def test_multiqubit():
     assert( check )
     for j in range(7):
         qc.measure(j,j)
-    counts  = simulate(qc,shots=shots,get='counts')
-    check = True
-    for string in ['0000000','0000111','1111000','1111111']:
-        p = counts[string]/shots
-        check = check and round(p,2)==0.25
-    assert( check )
+    for get in ['counts','expected_counts']:
+        counts  = simulate(qc,shots=shots,get='counts')
+        check = True
+        for string in ['0000000','0000111','1111000','1111111']:
+            p = counts[string]/shots
+            check = check and round(p,2)==0.25
+        assert( check )
 
 test_trig()
 test_x()

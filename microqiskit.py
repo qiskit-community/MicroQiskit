@@ -144,12 +144,15 @@ def simulate(qc,shots=1024,get='counts'):
             k[b0],k[b1]=k[b1],k[b0] # Flip the values.
   
   # Now for the outputs.
+    
+  # For the statevector output, simply return the statevector.
   if get=='statevector':
-    return k # Simply return the statevector.
+    return k
 
-  else: # Output for `get='counts'` and `get='memory'`.
+  else:
 
-    # This whole block is to raise errors when the user does things regarding measurements that are allowed in Qiskit but not in MicroQiskit.
+    # Other kinds of output involve measurements.
+    # The following block is to raise errors when the user does things regarding measurements that are allowed in Qiskit but not in MicroQiskit.
     # First we demand that all measure gates are of the form `measure(j,j)`, and that there is one for each qubit.
     for j in range(qc._n):
       assert (('m',j,j) in qc.data), 'Incorrect or missing measure command.'
@@ -163,24 +166,11 @@ def simulate(qc,shots=1024,get='counts'):
     # To calculate outputs, we convert the statevector into a list of probabilities.
     # Here `probs[j]` is the probability for the output bit string to be the n bit representation of j.
     probs = [e[0]**2+e[1]**2 for e in k]
-
-    if get=='counts':
-      # For simplicity and speed, the counts dictionary in MicroQiskit contains the expectation values for the counts.
-      # This differs from Qiskit, in which the counts values are sampled from a random process.
-      # For large values of `shots`, the results will be mostly equivalent for most common use cases.
-      # An error is therefore raised if the given shots value is too low.
-      # Note that this is done only for the benefit of microcontrollers.
-      # Ports should contruct the counts dictionary by getting and analysing a memory output.
-      # See the C++ port for an example.
-      # Counts produced in the way used here can be implemented as an additional 'fast counts' option.
-      # See the Lua port for an example.
-      assert shots>=4**qc._n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
-      # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
-      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
-
-    else: # Output for `get='memory'``.
-      # For the memory output, we sample from the probability distribution contained in `ps`.
-      # The `shots` samples that result are then collected in the list `m`, which is then returned.
+    
+    # The 'counts' and 'memory' outputs require us to sample from the above probability distribution.
+    # The `shots` samples that result are then collected in the list `m`.
+    if get in ['counts', 'memory']:
+        
       m=[]
       for _ in range(shots):
         cumu=0
@@ -193,7 +183,26 @@ def simulate(qc,shots=1024,get='counts'):
             out=('{0:0'+str(qc._n)+'b}').format(j)
             m.append(out)
             un=False
-      return m
+            
+      # For the memory output, we simply return `m`
+      if get=='memory':
+        return m
+      # For the counts output, we turn it into a counts dictionary first
+      else:
+        counts = {}
+        for out in m:
+          if out in counts:
+            counts[out] += 1
+          else:
+            counts[out] = 1
+        return counts
+    
+    elif get=='expected_counts':
+      # For simplicity and speed, the expectation values for the counts can be obtained.
+      # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
+      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
+
+
 
   # Note: Ports should also contain the possibility to get a Qiskit output, which returns a string containing a Python
   # program to create the given circuit qc. This is not needed here, since the same syntax as standard Qiskit is used.

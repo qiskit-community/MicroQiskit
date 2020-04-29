@@ -76,8 +76,8 @@ def simulate(qc,shots=1024,get='counts'):
             b1=b0+2**t  
             k[b0],k[b1]=k[b1],k[b0] 
   if get=='statevector':
-    return k 
-  else: 
+    return k
+  else:
     for j in range(qc._n):
       assert (('m',j,j) in qc.data), 'Incorrect or missing measure command.'
     m = [False for _ in range(qc._n)]
@@ -86,10 +86,7 @@ def simulate(qc,shots=1024,get='counts'):
         assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
         m[j] = (gate==('m',j,j))
     probs = [e[0]**2+e[1]**2 for e in k]
-    if get=='counts':
-      assert shots>=4**qc._n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
-      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
-    else: 
+    if get in ['counts', 'memory']:
       m=[]
       for _ in range(shots):
         cumu=0
@@ -101,4 +98,15 @@ def simulate(qc,shots=1024,get='counts'):
             out=('{0:0'+str(qc._n)+'b}').format(j)
             m.append(out)
             un=False
-      return m
+      if get=='memory':
+        return m
+      else:
+        counts = {}
+        for out in m:
+          if out in counts:
+            counts[out] += 1
+          else:
+            counts[out] = 1
+        return counts
+    elif get=='expected_counts':
+      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
