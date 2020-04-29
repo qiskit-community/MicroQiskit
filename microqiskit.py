@@ -54,18 +54,16 @@ class QuantumCircuit:
   def rz(self,theta,q):
     '''Applies an rz gate to the given qubit by the given angle.'''
     # This gate is constructed from `h` and `rx`.
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
+    self.h(q)
+    self.rx(theta,q)
+    self.h(q)
   
   def ry(self,theta,q):
     '''Applies an ry gate to the given qubit by the given angle.'''
-    # This gate is constructed from `h` and `rx`.
-    self.data.append(('rx',pi/2,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',-pi/2,q))
+    # This gate is constructed from `rx` and `rz`.
+    self.rx(pi/2,q)
+    self.rz(theta,q)
+    self.rx(-pi/2,q)
   
   def z(self,q):
     # This gate is constructed from `rz`.
@@ -76,7 +74,7 @@ class QuantumCircuit:
     '''Applies an y gate to the given qubit.'''
     # This gate is constructed from `rz` and `x`.
     self.rz(pi,q)
-    self.data.append(('x',q))
+    self.x(q)
 
 
 def simulate(qc,shots=1024,get='counts'):
@@ -107,8 +105,7 @@ def simulate(qc,shots=1024,get='counts'):
       else: # This allows for simple lists of real numbers to be accepted as input.
         k = [[e,0] for e in gate[1]]
         
-    elif gate[0]=='m':
-
+    elif gate[0]=='m': # For measurement, keep a record of which bit goes with which qubit.
       output_map[gate[2]] = gate[1]
     
     elif gate[0] in ['x','h','rx']: # These are the only single qubit gates recognized by the simulator.
@@ -130,7 +127,7 @@ def simulate(qc,shots=1024,get='counts'):
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
     
-    elif gate[0]=='cx':
+    elif gate[0]=='cx': # This is the only two qubit gate recognized by the simulator.
       
       # Get the source and target qubits
       [s,t] = gate[1:]
@@ -148,6 +145,7 @@ def simulate(qc,shots=1024,get='counts'):
             b1=b0+2**t  # Index corresponding to the same bit string except that digit `t` is '1'.
             k[b0],k[b1]=k[b1],k[b0] # Flip the values.
   
+  
   # Now for the outputs.
     
   # For the statevector output, simply return the statevector.
@@ -155,10 +153,10 @@ def simulate(qc,shots=1024,get='counts'):
     return k
 
   else:
-
     # Other kinds of output involve measurements.
-    # The following block is to raise errors when the user does things regarding measurements that are allowed in Qiskit but not in MicroQiskit.
-    # We demand that no gates are applied to a qubit after its measure command.
+
+    # In MicroQiskit, we demand that no gates are applied to a qubit after its measure command.
+    # The following block raises an error if this is not obeyed.
     m = [False for _ in range(qc._n)]
     for gate in qc.data:
       for j in range(qc._n):
@@ -170,9 +168,9 @@ def simulate(qc,shots=1024,get='counts'):
     probs = [e[0]**2+e[1]**2 for e in k]
     
     # The 'counts' and 'memory' outputs require us to sample from the above probability distribution.
-    # The `shots` samples that result are then collected in the list `m`.
     if get in ['counts', 'memory']:
         
+      # The `shots` samples that result are then collected in the list `m`.
       m=[]
       for _ in range(shots):
         cumu=0

@@ -26,20 +26,18 @@ class QuantumCircuit:
     assert q<self._n, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
   def rz(self,theta,q):
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
+    self.h(q)
+    self.rx(theta,q)
+    self.h(q)
   def ry(self,theta,q):
-    self.data.append(('rx',pi/2,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',-pi/2,q))
+    self.rx(pi/2,q)
+    self.rz(theta,q)
+    self.rx(-pi/2,q)
   def z(self,q):
     self.rz(pi,q)
   def y(self,q):
     self.rz(pi,q)
-    self.data.append(('x',q))
+    self.x(q)
 def simulate(qc,shots=1024,get='counts'):
   def superpose(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
@@ -54,7 +52,7 @@ def simulate(qc,shots=1024,get='counts'):
         k = [e for e in gate[1]]
       else: 
         k = [[e,0] for e in gate[1]]
-    elif gate[0]=='m':
+    elif gate[0]=='m': 
       output_map[gate[2]] = gate[1]
     elif gate[0] in ['x','h','rx']: 
       j = gate[-1] 
@@ -69,7 +67,7 @@ def simulate(qc,shots=1024,get='counts'):
           else: 
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
-    elif gate[0]=='cx':
+    elif gate[0]=='cx': 
       [s,t] = gate[1:]
       [l,h] = sorted([s,t])
       for i0 in range(2**l):

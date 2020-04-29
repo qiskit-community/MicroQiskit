@@ -68,6 +68,11 @@ def test_rx():
     qc.h(1)
     assert(simulate(qc,get='statevector')==[[0.4157348061435736, -0.27778511650465676], [0.4903926401925336, 0.0975451610062577], [0.4903926401925336, -0.0975451610062577], [0.4157348061435736, 0.27778511650465676]])
     
+def test_ry():
+    qc = QuantumCircuit(1)
+    qc.ry(pi/8,0)
+    assert(simulate(qc,get='statevector')==[[0.9807852803850672, -6.938893903907228e-17], [0.19509032201251536, 0.0]])
+    
 def test_cx():
     qc = QuantumCircuit(2)
     qc.h(0)
@@ -79,7 +84,6 @@ def test_cx():
     qc.cx(1,0)
     qc.cx(0,1)
     assert( simulate(qc,shots=shots,get='statevector')==[[0.0, 0.0], [0.0, 0.0], [1.0, 0.0], [0.0, 0.0]] )
-    
 
 def test_memory():
     qc = QuantumCircuit(2,2)
