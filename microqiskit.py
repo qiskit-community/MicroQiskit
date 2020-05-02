@@ -10,9 +10,6 @@ class QuantumCircuit:
   
   def __init__(self,n,m=0):
     '''Defines and initializes the attributes'''
-    # The number of qubits and number of output bits must be equal in any circuit with `measure` gates.
-    # This is a MicroQiskit only requirement, and so an `assert` statement is used to warn Qiskit users.
-    assert (n==m or m==0), 'The number of qubits and outputs must be equal in MicroQiskit.'
     # Number of qubits `n` and number of output bits `m` are attributes of QuantumCircuit objects in MicroQiskit, but not in Qiskit.
     # For this reason, the initial _ is used.
     self._n=n
@@ -51,23 +48,22 @@ class QuantumCircuit:
   def measure(self,q,b):
     '''Applies an measure gate to the given qubit and bit.'''
     assert b<self._m, 'Index for output bit out of range.'
+    assert q<self._n, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
   
   def rz(self,theta,q):
     '''Applies an rz gate to the given qubit by the given angle.'''
     # This gate is constructed from `h` and `rx`.
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
+    self.h(q)
+    self.rx(theta,q)
+    self.h(q)
   
   def ry(self,theta,q):
     '''Applies an ry gate to the given qubit by the given angle.'''
-    # This gate is constructed from `h` and `rx`.
-    self.data.append(('rx',pi/2,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',theta,q))
-    self.data.append(('h',q))
-    self.data.append(('rx',-pi/2,q))
+    # This gate is constructed from `rx` and `rz`.
+    self.rx(pi/2,q)
+    self.rz(theta,q)
+    self.rx(-pi/2,q)
   
   def z(self,q):
     # This gate is constructed from `rz`.
@@ -78,7 +74,7 @@ class QuantumCircuit:
     '''Applies an y gate to the given qubit.'''
     # This gate is constructed from `rz` and `x`.
     self.rz(pi,q)
-    self.data.append(('x',q))
+    self.x(q)
 
 
 def simulate(qc,shots=1024,get='counts'):
@@ -96,6 +92,9 @@ def simulate(qc,shots=1024,get='counts'):
   k = [[0,0] for _ in range(2**qc._n)] # First with zeros everywhere.
   k[0] = [1.0,0.0] # Then a single 1 to create the all |0> state.
 
+  # The `output_map` dictionary keeps track of which qubits are read out to which output bits
+  output_map = {}
+
   # Now we go through the gates and apply them to the statevector.
   # Each gate is specified by a tuple, as defined in the QuantumCircuit class
   for gate in qc.data:
@@ -105,6 +104,9 @@ def simulate(qc,shots=1024,get='counts'):
         k = [e for e in gate[1]]
       else: # This allows for simple lists of real numbers to be accepted as input.
         k = [[e,0] for e in gate[1]]
+        
+    elif gate[0]=='m': # For measurement, keep a record of which bit goes with which qubit.
+      output_map[gate[2]] = gate[1]
     
     elif gate[0] in ['x','h','rx']: # These are the only single qubit gates recognized by the simulator.
       
@@ -125,7 +127,7 @@ def simulate(qc,shots=1024,get='counts'):
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
     
-    elif gate[0]=='cx':
+    elif gate[0]=='cx': # This is the only two qubit gate recognized by the simulator.
       
       # Get the source and target qubits
       [s,t] = gate[1:]
@@ -143,17 +145,18 @@ def simulate(qc,shots=1024,get='counts'):
             b1=b0+2**t  # Index corresponding to the same bit string except that digit `t` is '1'.
             k[b0],k[b1]=k[b1],k[b0] # Flip the values.
   
+  
   # Now for the outputs.
+    
+  # For the statevector output, simply return the statevector.
   if get=='statevector':
-    return k # Simply return the statevector.
+    return k
 
-  else: # Output for `get='counts'` and `get='memory'`.
+  else:
+    # Other kinds of output involve measurements.
 
-    # This whole block is to raise errors when the user does things regarding measurements that are allowed in Qiskit but not in MicroQiskit.
-    # First we demand that all measure gates are of the form `measure(j,j)`, and that there is one for each qubit.
-    for j in range(qc._n):
-      assert (('m',j,j) in qc.data), 'Incorrect or missing measure command.'
-    # Then we demand that no gates are applied to a qubit after its measure command.
+    # In MicroQiskit, we demand that no gates are applied to a qubit after its measure command.
+    # The following block raises an error if this is not obeyed.
     m = [False for _ in range(qc._n)]
     for gate in qc.data:
       for j in range(qc._n):
@@ -163,22 +166,11 @@ def simulate(qc,shots=1024,get='counts'):
     # To calculate outputs, we convert the statevector into a list of probabilities.
     # Here `probs[j]` is the probability for the output bit string to be the n bit representation of j.
     probs = [e[0]**2+e[1]**2 for e in k]
-
-    if get=='counts':
-      # For simplicity and speed, the counts dictionary in MicroQiskit contains the expectation values for the counts.
-      # This differs from Qiskit, in which the counts values are sampled from a random process.
-      # For large values of `shots`, the results will be mostly equivalent for most common use cases.
-      # An error is therefore raised if the given shots value is too low.
-      # Note that this is done only for the benefit of microcontrollers.
-      # Ports should contruct the counts dictionary by getting and analysing a memory output.
-      # See the C++ port for an example.
-      assert shots>=4**qc._n, 'Use at least shots=4**n to get well-behaved counts in MicroQiskit.'
-      # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
-      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
-
-    else: # Output for `get='memory'``.
-      # For the memory output, we sample from the probability distribution contained in `ps`.
-      # The `shots` samples that result are then collected in the list `m`, which is then returned.
+    
+    # The 'counts' and 'memory' outputs require us to sample from the above probability distribution.
+    if get in ['counts', 'memory']:
+        
+      # The `shots` samples that result are then collected in the list `m`.
       m=[]
       for _ in range(shots):
         cumu=0
@@ -186,12 +178,37 @@ def simulate(qc,shots=1024,get='counts'):
         r=random.random()
         for j,p in enumerate(probs):
           cumu += p
-          if r<cumu and un:
-            # When the `j`th element is chosen, the output is the n bit representation of j.
-            out=('{0:0'+str(qc._n)+'b}').format(j)
+          if r<cumu and un:    
+            # When the `j`th element is chosen, get the n bit representation of j.
+            raw_out=('{0:0'+str(qc._n)+'b}').format(j)
+            # Convert this into an m bit string, with the order specified by the measure commands
+            out_list = ['0']*qc._m
+            for bit in output_map:
+              out_list[qc._m-1-bit] = raw_out[qc._n-1-output_map[bit]]
+            out = ''.join(out_list)
+            # Add this to the list of samples
             m.append(out)
             un=False
-      return m
+            
+      # For the memory output, we simply return `m`
+      if get=='memory':
+        return m
+      # For the counts output, we turn it into a counts dictionary first
+      else:
+        counts = {}
+        for out in m:
+          if out in counts:
+            counts[out] += 1
+          else:
+            counts[out] = 1
+        return counts
+    
+    elif get=='expected_counts':
+      # For simplicity and speed, the expectation values for the counts can be obtained.
+      # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
+      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
+
+
 
   # Note: Ports should also contain the possibility to get a Qiskit output, which returns a string containing a Python
   # program to create the given circuit qc. This is not needed here, since the same syntax as standard Qiskit is used.

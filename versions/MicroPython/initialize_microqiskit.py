@@ -68,6 +68,11 @@ def test_rx():
     qc.h(1)
     assert(simulate(qc,get='statevector')==[[0.4157348061435736, -0.27778511650465676], [0.4903926401925336, 0.0975451610062577], [0.4903926401925336, -0.0975451610062577], [0.4157348061435736, 0.27778511650465676]])
     
+def test_ry():
+    qc = QuantumCircuit(1)
+    qc.ry(pi/8,0)
+    assert(simulate(qc,get='statevector')==[[0.9807852803850672, -6.938893903907228e-17], [0.19509032201251536, 0.0]])
+    
 def test_cx():
     qc = QuantumCircuit(2)
     qc.h(0)
@@ -79,7 +84,6 @@ def test_cx():
     qc.cx(1,0)
     qc.cx(0,1)
     assert( simulate(qc,shots=shots,get='statevector')==[[0.0, 0.0], [0.0, 0.0], [1.0, 0.0], [0.0, 0.0]] )
-    
 
 def test_memory():
     qc = QuantumCircuit(2,2)
@@ -109,10 +113,11 @@ def test_counts():
     qc.h(1)
     qc.measure(0,0)
     qc.measure(1,1)
-    c = simulate(qc,shots=shots,get='counts')
-    for out in c:
-      p = c[out]/shots
-      assert( round(p,2)==0.25 )
+    for get in ['counts','expected_counts']:
+        c = simulate(qc,shots=shots,get='counts')
+        for out in c:
+          p = c[out]/shots
+          assert( round(p,2)==0.25 )
         
 def test_add():
     for n in [1,2]:
@@ -121,10 +126,11 @@ def test_add():
         for j in range(n):
             qc.h(j)
             meas.measure(j,j)
-        c = simulate(qc+meas,shots=shots,get='counts')
-        for out in c:
-            p = c[out]/shots
-            assert( round(p,2)==round(1.0/2**n,2) )
+        for get in ['counts','expected_counts']:
+            c = simulate(qc+meas,shots=shots,get=get)
+            for out in c:
+                p = c[out]/shots
+                assert( round(p,2)==round(1.0/2**n,2) )
     
 def test_multiqubit():
     qc = QuantumCircuit(7,7)
@@ -142,13 +148,56 @@ def test_multiqubit():
     assert( check )
     for j in range(7):
         qc.measure(j,j)
-    counts  = simulate(qc,shots=shots,get='counts')
+    for get in ['counts','expected_counts']:
+        counts  = simulate(qc,shots=shots,get='counts')
+        check = True
+        for string in ['0000000','0000111','1111000','1111111']:
+            p = counts[string]/shots
+            check = check and round(p,2)==0.25
+        assert( check )
+
+def test_multiqubit():
+    qc = QuantumCircuit(7,7)
+    qc.h(0)
+    qc.cx(0,2)
+    qc.cx(2,1)
+    qc.h(5)
+    qc.cx(5,3)
+    qc.cx(3,4)
+    qc.cx(3,6)
+    ket = simulate(qc,get='statevector')
     check = True
     for string in ['0000000','0000111','1111000','1111111']:
-        p = counts[string]/shots
-        check = check and round(p,2)==0.25
+        check = check and round(ket[int(string,2)][0],2)==0.50
     assert( check )
-
+    for j in range(7):
+        qc.measure(j,j)
+    for get in ['counts','expected_counts']:
+        counts  = simulate(qc,shots=shots,get='counts')
+        check = True
+        for string in ['0000000','0000111','1111000','1111111']:
+            p = counts[string]/shots
+            check = check and round(p,2)==0.25
+        assert( check )
+        
+def test_reorder ():
+    qc = QuantumCircuit(2,2)
+    qc.x(0)
+    qc.measure(0,1)
+    qc.measure(1,0)
+    counts = simulate(qc,shots=shots,get='counts')
+    assert counts['01']==shots
+    qc = QuantumCircuit(5,4)
+    qc.x(1)
+    qc.x(3)
+    qc.x(4)
+    qc.measure(1,0)
+    qc.measure(3,1)
+    qc.measure(4,2)
+    qc.measure(0,3)
+    counts = simulate(qc,shots=shots,get='counts')
+    assert counts['0111']==shots
+        
 test_trig()
 test_x()
 test_h()
