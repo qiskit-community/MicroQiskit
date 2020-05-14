@@ -24,7 +24,7 @@ See https://qiskit.org for more on Qiskit.
     which instead returns the expectation value of the counts.
     
 
-.. class:: QuantumCircuit(num_qubits, num_bits=0)
+.. class:: QuantumCircuit(num_qubits, num_clbits=0)
 
     Contains a quantum circuit, which is essentially a list of quantum gates
     that are applied to a register of qubits. At the end, a binary output is
@@ -66,3 +66,11 @@ See https://qiskit.org for more on Qiskit.
     .. classmethod:: measure(qubit,bit)
     
         Adds a measure gate, which extracts a bit of output from the given qubit.
+        
+    .. attribute:: num_qubits
+    
+        Returns the number of qubits in the circuit.
+        
+    .. attribute:: num_clbits
+    
+        Returns the number of classical bits in the circuit.
