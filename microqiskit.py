@@ -12,15 +12,15 @@ class QuantumCircuit:
     '''Defines and initializes the attributes'''
     # Number of qubits `n` and number of output bits `m` are attributes of QuantumCircuit objects in MicroQiskit, but not in Qiskit.
     # For this reason, the initial _ is used.
-    self._n=n
-    self._m=m
+    self.num_qubits=n
+    self.num_clbits=m
     # Like Qiskit, QuantumCircuit objects in MicroQiskit have a `data` attribute, which is essentially a list of gates.
     # The contents of this in MicroQiskit are tailored to the needs of the `simulate` function.
     self.data=[]
   
   def __add__(self,self2):
     '''Allows QuantumCircuit objects to be added, as in Qiskit.'''
-    self3=QuantumCircuit(max(self._n,self2._n),max(self._m,self2._m))
+    self3=QuantumCircuit(max(self.num_qubits,self2.num_qubits),max(self.num_clbits,self2.num_clbits))
     self3.data=self.data+self2.data
     return self3
   
@@ -47,8 +47,8 @@ class QuantumCircuit:
   
   def measure(self,q,b):
     '''Applies an measure gate to the given qubit and bit.'''
-    assert b<self._m, 'Index for output bit out of range.'
-    assert q<self._n, 'Index for qubit out of range.'
+    assert b<self.num_clbits, 'Index for output bit out of range.'
+    assert q<self.num_qubits, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
   
   def rz(self,theta,q):
@@ -89,11 +89,11 @@ def simulate(qc,shots=1024,get='counts'):
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   
   # Initialize a 2^n element statevector. Complex numbers are expressed as a list of two real numbers.
-  k = [[0,0] for _ in range(2**qc._n)] # First with zeros everywhere.
+  k = [[0,0] for _ in range(2**qc.num_qubits)] # First with zeros everywhere.
   k[0] = [1.0,0.0] # Then a single 1 to create the all |0> state.
 
-  # The `output_map` dictionary keeps track of which qubits are read out to which output bits
-  output_map = {}
+  # The `outputnum_clbitsap` dictionary keeps track of which qubits are read out to which output bits
+  outputnum_clbitsap = {}
 
   # Now we go through the gates and apply them to the statevector.
   # Each gate is specified by a tuple, as defined in the QuantumCircuit class
@@ -106,7 +106,7 @@ def simulate(qc,shots=1024,get='counts'):
         k = [[e,0] for e in gate[1]]
         
     elif gate[0]=='m': # For measurement, keep a record of which bit goes with which qubit.
-      output_map[gate[2]] = gate[1]
+      outputnum_clbitsap[gate[2]] = gate[1]
     
     elif gate[0] in ['x','h','rx']: # These are the only single qubit gates recognized by the simulator.
       
@@ -116,7 +116,7 @@ def simulate(qc,shots=1024,get='counts'):
       # These pairs are the elements whose corresponding bit strings differ only on bit `j`.
       # The following loops allow us to loop over all of these pairs.
       for i0 in range(2**j):
-        for i1 in range(2**(qc._n-j-1)):
+        for i1 in range(2**(qc.num_qubits-j-1)):
           b0=i0+2**(j+1)*i1 # Index corresponding to bit string for which the `j`th digit is '0'.
           b1=b0+2**j # Index corresponding to the same bit string except that the `j`th digit is '1'.
           if gate[0]=='x': # For x, just flip the values
@@ -140,7 +140,7 @@ def simulate(qc,shots=1024,get='counts'):
       # The following loops allow us to loop over all of these pairs.
       for i0 in range(2**l):
         for i1 in range(2**(h-l-1)):
-          for i2 in range(2**(qc._n-h-1)):
+          for i2 in range(2**(qc.num_qubits-h-1)):
             b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**s # Index corresponding to bit string for which digit `s` is `1` and digit `t` is '0'.
             b1=b0+2**t  # Index corresponding to the same bit string except that digit `t` is '1'.
             k[b0],k[b1]=k[b1],k[b0] # Flip the values.
@@ -157,9 +157,9 @@ def simulate(qc,shots=1024,get='counts'):
 
     # In MicroQiskit, we demand that no gates are applied to a qubit after its measure command.
     # The following block raises an error if this is not obeyed.
-    m = [False for _ in range(qc._n)]
+    m = [False for _ in range(qc.num_qubits)]
     for gate in qc.data:
-      for j in range(qc._n):
+      for j in range(qc.num_qubits):
         assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
         m[j] = (gate==('m',j,j))
 
@@ -180,11 +180,11 @@ def simulate(qc,shots=1024,get='counts'):
           cumu += p
           if r<cumu and un:    
             # When the `j`th element is chosen, get the n bit representation of j.
-            raw_out=('{0:0'+str(qc._n)+'b}').format(j)
+            raw_out=('{0:0'+str(qc.num_qubits)+'b}').format(j)
             # Convert this into an m bit string, with the order specified by the measure commands
-            out_list = ['0']*qc._m
-            for bit in output_map:
-              out_list[qc._m-1-bit] = raw_out[qc._n-1-output_map[bit]]
+            out_list = ['0']*qc.num_clbits
+            for bit in outputnum_clbitsap:
+              out_list[qc.num_clbits-1-bit] = raw_out[qc.num_qubits-1-outputnum_clbitsap[bit]]
             out = ''.join(out_list)
             # Add this to the list of samples
             m.append(out)
@@ -206,7 +206,7 @@ def simulate(qc,shots=1024,get='counts'):
     elif get=='expected_counts':
       # For simplicity and speed, the expectation values for the counts can be obtained.
       # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
-      return {('{0:0'+str(qc._n)+'b}').format(j):p*shots for j,p in enumerate(probs)}
+      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p*shots for j,p in enumerate(probs)}
 
 
 
