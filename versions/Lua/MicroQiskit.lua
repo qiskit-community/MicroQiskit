@@ -9,8 +9,8 @@ function QuantumCircuit ()
   local qc = {}
 
   local function set_registers (n,m)
-    qc._n = n
-    qc._m = m or 0
+    qc.num_qubits = n
+    qc.num_clbits = m or 0
   end
   qc.set_registers = set_registers
 
@@ -29,8 +29,8 @@ function QuantumCircuit ()
   end
 
   function qc.add_circuit (qc2)
-    qc._n = math.max(qc._n,qc2._n)
-    qc._m = math.max(qc._m,qc2._m)
+    qc.num_qubits = math.max(qc.num_qubits,qc2.num_qubits)
+    qc.num_clbits = math.max(qc.num_clbits,qc2.num_clbits)
     for g, gate in pairs(qc2.data) do
       qc.data[#qc.data+1] = ( gate )    
     end
@@ -103,11 +103,11 @@ function simulate (qc, get, shots)
   end
 
   function get_out (j)
-    raw_out = as_bits(j-1,qc._n)
+    raw_out = as_bits(j-1,qc.num_qubits)
     out = ""
-    for b=0,qc._m-1 do
-      if output_map[b] then
-        out = raw_out[qc._n-output_map[b]]..out
+    for b=0,qc.num_clbits-1 do
+      if outputnum_clbitsap[b] then
+        out = raw_out[qc.num_qubits-outputnum_clbitsap[b]]..out
       end
     end
     return out
@@ -115,12 +115,12 @@ function simulate (qc, get, shots)
 
 
   ket = {}
-  for j=1,2^qc._n do
+  for j=1,2^qc.num_qubits do
     ket[j] = {0,0}
   end
   ket[1] = {1,0}
 
-  output_map = {}
+  outputnum_clbitsap = {}
 
   for g, gate in pairs(qc.data) do
 
@@ -132,14 +132,14 @@ function simulate (qc, get, shots)
 
     elseif gate[1]=='m' then
 
-      output_map[gate[3]] = gate[2]
+      outputnum_clbitsap[gate[3]] = gate[2]
 
     elseif gate[1]=="x" or gate[1]=="rx" or gate[1]=="h" then
 
       j = gate[#gate]
 
       for i0=0,2^j-1 do
-        for i1=0,2^(qc._n-j-1)-1 do
+        for i1=0,2^(qc.num_qubits-j-1)-1 do
           b1=i0+2^(j+1)*i1 + 1
           b2=b1+2^j
 
@@ -179,7 +179,7 @@ function simulate (qc, get, shots)
 
       for i0=0,2^l-1 do
         for i1=0,2^(h-l-1)-1 do
-          for i2=0,2^(qc._n-h-1)-1 do
+          for i2=0,2^(qc.num_qubits-h-1)-1 do
             b1 = i0 + 2^(l+1)*i1 + 2^(h+1)*i2 + 2^s + 1
             b2 = b1 + 2^t
             e = {{ket[b1][1],ket[b1][2]},{ket[b2][1],ket[b2][2]}}

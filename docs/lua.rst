@@ -74,3 +74,11 @@ See https://qiskit.org for more on Qiskit.
         Adds a measure gate, which extracts a bit of output from the given qubit.
         Note that, unlike in the full version of Qiskit, measurements are always
         applied at the end, irrespective of where they are placed in the circuit.
+    
+    .. attribute:: num_qubits
+    
+        Returns the number of qubits in the circuit.
+        
+    .. attribute:: num_clbits
+    
+        Returns the number of classical bits in the circuit.
