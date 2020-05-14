@@ -10,8 +10,7 @@ class QuantumCircuit:
   
   def __init__(self,n,m=0):
     '''Defines and initializes the attributes'''
-    # Number of qubits `n` and number of output bits `m` are attributes of QuantumCircuit objects in MicroQiskit, but not in Qiskit.
-    # For this reason, the initial _ is used.
+    # The number of qubits and the number of output bits are attributes of QuantumCircuit objects.
     self.num_qubits=n
     self.num_clbits=m
     # Like Qiskit, QuantumCircuit objects in MicroQiskit have a `data` attribute, which is essentially a list of gates.
