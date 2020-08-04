@@ -1,0 +1,9 @@
+# Default owners
+
+*       @quantumjim @faf
+
+# Owners for specific versions
+
+/versions/MicroPython @quantumjim
+/versions/Lua @quantumjim
+/versions/C++ @quantumjim @faf
