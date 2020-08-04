@@ -1,10 +1,10 @@
 # Default owners
 
-* @quantumjim @faf
+* @quantumjim @TigrisCallidus
 
 
 # Owners for specific versions
 
 /versions/MicroPython @quantumjim
 /versions/Lua @quantumjim
-/versions/C++ @quantumjim @faf
+/versions/C++ @quantumjim @TigrisCallidus
