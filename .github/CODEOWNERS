@@ -1,0 +1,10 @@
+# Default owners
+
+* @quantumjim @TigrisCallidus
+
+
+# Owners for specific versions
+
+/versions/MicroPython @quantumjim
+/versions/Lua @quantumjim
+/versions/C++ @quantumjim @TigrisCallidus
