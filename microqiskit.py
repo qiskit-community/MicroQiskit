@@ -13,6 +13,8 @@ class QuantumCircuit:
     # The number of qubits and the number of output bits are attributes of QuantumCircuit objects.
     self.num_qubits=n
     self.num_clbits=m
+    # It is possible to set a name for a circuit
+    self.name = ''
     # Like Qiskit, QuantumCircuit objects in MicroQiskit have a `data` attribute, which is essentially a list of gates.
     # The contents of this in MicroQiskit are tailored to the needs of the `simulate` function.
     self.data=[]
@@ -25,7 +27,7 @@ class QuantumCircuit:
   
   def initialize(self,k):
     '''Initializes the qubits in a given state.'''
-    self.data.clear() # Clear existing gates.
+    self.data = [] # Clear existing gates.
     self.data.append(('init',[e for e in k])) # Add the instruction to initialize, including the required state.
   
   def x(self,q):
@@ -85,6 +87,7 @@ def simulate(qc,shots=1024,get='counts'):
   
   def turn(x,y,theta):
     '''For two elements of the statevector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
+    theta = float(theta)
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   
   # Initialize a 2^n element statevector. Complex numbers are expressed as a list of two real numbers.
@@ -202,10 +205,9 @@ def simulate(qc,shots=1024,get='counts'):
             counts[out] = 1
         return counts
     
-    elif get=='expected_counts':
-      # For simplicity and speed, the expectation values for the counts can be obtained.
-      # For each p=probs[j], the key is the n bit representation of j, and the value is `p*shots`.
-      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p*shots for j,p in enumerate(probs)}
+    elif get=='probabilities_dict':
+      # For each p=probs[j], the key is the n bit representation of j, and the value is p.
+      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p for j,p in enumerate(probs)}
 
 
 
