@@ -27,7 +27,7 @@ class QuantumCircuit:
   
   def initialize(self,k):
     '''Initializes the qubits in a given state.'''
-    self.data = [] # Clear existing gates.
+    self.data[:] = [] # Clear existing gates.
     self.data.append(('init',[e for e in k])) # Add the instruction to initialize, including the required state.
   
   def x(self,q):
