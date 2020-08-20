@@ -22,6 +22,7 @@ Installation guides for the various versions of MicroQiskit can be found in the 
 * [MicroPython/Python 2](versions/MicroPython/README.md)
 * [Lua](versions/Lua/README.md)
 * [C++](versions/C++/README.md)
+* [C#](versions/C#/README.md)
 
 
 ### Template Version
