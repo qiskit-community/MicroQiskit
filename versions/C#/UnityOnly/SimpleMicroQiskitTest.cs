@@ -1,7 +1,7 @@
 ﻿using Qiskit;
 using UnityEngine;
 
-public class SimpleMicroQuiskitTest : CalculationBase
+public class SimpleMicroQiskitTest : CalculationBase
 {
 
     public ComplexNumber[] amplitudes;
@@ -11,9 +11,9 @@ public class SimpleMicroQuiskitTest : CalculationBase
 
 
 
-    SimulatorBase simulator = new MicroQuiskitSimulator();
+    SimulatorBase simulator = new MicroQiskitSimulator();
 
-    public string QuiskitString = "";
+    public string QiskitString = "";
 
     public SimulatorType UsedSimulator;
 
@@ -30,7 +30,7 @@ public class SimpleMicroQuiskitTest : CalculationBase
     {
         amplitudes = simulator.Simulate(Circuit);
         Probabilities = simulator.GetProbabilities(amplitudes);
-        QuiskitString = Circuit.GetQuiskitString();
+        QiskitString = Circuit.GetQiskitString();
 
     }
 
@@ -54,10 +54,10 @@ public class SimpleMicroQuiskitTest : CalculationBase
         switch (UsedSimulator)
         {
             case SimulatorType.Micro:
-                simulator = new MicroQuiskitSimulator();
+                simulator = new MicroQiskitSimulator();
                 break;
             case SimulatorType.PythonMicro:
-                simulator = new PythonMicroQuiskitSimulator();
+                simulator = new PythonMicroQiskitSimulator();
                 break;
             default:
                 break;
@@ -71,7 +71,7 @@ public class SimpleMicroQuiskitTest : CalculationBase
     }
 }
 
-public class PythonMicroQuiskitSimulator : SimulatorBase
+public class PythonMicroQiskitSimulator : SimulatorBase
 {
     //You can write your own Simulator
 }
