@@ -14,4 +14,4 @@ The files, which are present in the package, can also be found directly in the U
 
 ### Documentation
 
-* [Documentation for Qiskit](https://qiskit.org/documentation/)
+Specific documentation has not yet been written for this version. Instead see [here](https://microqiskit.readthedocs.io/en/latest/#) for general usage.
