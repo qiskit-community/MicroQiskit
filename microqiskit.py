@@ -155,22 +155,24 @@ def simulate(qc,shots=1024,get='counts'):
     return k
 
   else:
-    # Other kinds of output involve measurements.
-
-    # In MicroQiskit, we demand that no gates are applied to a qubit after its measure command.
-    # The following block raises an error if this is not obeyed.
-    m = [False for _ in range(qc.num_qubits)]
-    for gate in qc.data:
-      for j in range(qc.num_qubits):
-        assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
-        m[j] = (gate==('m',j,j))
-
+        
     # To calculate outputs, we convert the statevector into a list of probabilities.
     # Here `probs[j]` is the probability for the output bit string to be the n bit representation of j.
     probs = [e[0]**2+e[1]**2 for e in k]
-    
-    # The 'counts' and 'memory' outputs require us to sample from the above probability distribution.
-    if get in ['counts', 'memory']:
+        
+    # This can be output directly (as with Statevector or DensityMatrix in Qiskit
+    if get=='probabilities_dict':
+      # For each p=probs[j], the key is the n bit representation of j, and the value is p.
+      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p for j,p in enumerate(probs)}
+    # Otherwise, we need to sample
+    elif get in ['counts', 'memory']:
+      # When using these kinds of outputs in MicroQiskit, we demand that no gates are applied to a qubit after its measure command.
+      # The following block raises an error if this is not obeyed.
+      m = [False for _ in range(qc.num_qubits)]
+      for gate in qc.data:
+        for j in range(qc.num_qubits):
+          assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
+          m[j] = (gate==('m',j,j))
         
       # The `shots` samples that result are then collected in the list `m`.
       m=[]
@@ -204,11 +206,6 @@ def simulate(qc,shots=1024,get='counts'):
           else:
             counts[out] = 1
         return counts
-    
-    elif get=='probabilities_dict':
-      # For each p=probs[j], the key is the n bit representation of j, and the value is p.
-      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p for j,p in enumerate(probs)}
-
 
 
   # Note: Ports should also contain the possibility to get a Qiskit output, which returns a string containing a Python
