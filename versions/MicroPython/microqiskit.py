@@ -5,13 +5,14 @@ class QuantumCircuit:
   def __init__(self,n,m=0):
     self.num_qubits=n
     self.num_clbits=m
+    self.name = ''
     self.data=[]
   def __add__(self,self2):
     self3=QuantumCircuit(max(self.num_qubits,self2.num_qubits),max(self.num_clbits,self2.num_clbits))
     self3.data=self.data+self2.data
     return self3
   def initialize(self,k):
-    self.data.clear() 
+    self.data[:] = [] 
     self.data.append(('init',[e for e in k])) 
   def x(self,q):
     self.data.append(('x',q))
@@ -42,6 +43,7 @@ def simulate(qc,shots=1024,get='counts'):
   def superpose(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
   def turn(x,y,theta):
+    theta = float(theta)
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   k = [[0,0] for _ in range(2**qc.num_qubits)] 
   k[0] = [1.0,0.0] 
@@ -79,13 +81,15 @@ def simulate(qc,shots=1024,get='counts'):
   if get=='statevector':
     return k
   else:
-    m = [False for _ in range(qc.num_qubits)]
-    for gate in qc.data:
-      for j in range(qc.num_qubits):
-        assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
-        m[j] = (gate==('m',j,j))
     probs = [e[0]**2+e[1]**2 for e in k]
-    if get in ['counts', 'memory']:
+    if get=='probabilities_dict':
+      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p for j,p in enumerate(probs)}
+    elif get in ['counts', 'memory']:
+      m = [False for _ in range(qc.num_qubits)]
+      for gate in qc.data:
+        for j in range(qc.num_qubits):
+          assert  not ((gate[-1]==j) and m[j]), 'Incorrect or missing measure command.'
+          m[j] = (gate==('m',j,j))
       m=[]
       for _ in range(shots):
         cumu=0
@@ -111,5 +115,3 @@ def simulate(qc,shots=1024,get='counts'):
           else:
             counts[out] = 1
         return counts
-    elif get=='expected_counts':
-      return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p*shots for j,p in enumerate(probs)}
