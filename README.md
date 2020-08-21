@@ -15,11 +15,15 @@ MicroQiskit is written to be as compatible with Qiskit as possible. Learning qua
 * [Documentation for MicroQiskit](https://microqiskit.readthedocs.io/en/latest/#)
 * [Documentation for Qiskit](https://qiskit.org/documentation/)
 
+### Tutorial
+
+* [Tutorial for MicroPython/Python 2/Python 3 version](versions/MicroPython/tutorials/index.ipynb)
+
 ### Installation
 
 Installation guides for the various versions of MicroQiskit can be found in the corresponding README files.
 
-* [MicroPython/Python 2](versions/MicroPython/README.md)
+* [MicroPython/Python 2/Python 3](versions/MicroPython/README.md)
 * [Lua](versions/Lua/README.md)
 * [C++](versions/C++/README.md)
 * [C#](versions/C%23/README.md)
