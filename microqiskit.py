@@ -23,6 +23,7 @@ class QuantumCircuit:
     '''Allows QuantumCircuit objects to be added, as in Qiskit.'''
     self3=QuantumCircuit(max(self.num_qubits,self2.num_qubits),max(self.num_clbits,self2.num_clbits))
     self3.data=self.data+self2.data
+    self3.name = self.name
     return self3
   
   def initialize(self,k):
