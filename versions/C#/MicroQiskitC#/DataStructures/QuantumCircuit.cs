@@ -217,7 +217,7 @@ namespace Qiskit
             return returnValue;
         }
 
-        public string GetQuiskitString()
+        public string GetQiskitString()
         {
             string translation = "";
 

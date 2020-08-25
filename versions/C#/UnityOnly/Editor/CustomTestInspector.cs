@@ -2,14 +2,14 @@
 using UnityEditor;
 
 
-[CustomEditor(typeof(SimpleMicroQuiskitTest))]
+[CustomEditor(typeof(SimpleMicroQiskitTest))]
 //Custom Editor for the BazeMaze class, adding some buttons and a representation of the Maze
 public class CustomTestInspector : Editor {
 
-    SimpleMicroQuiskitTest targetTest;
+    SimpleMicroQiskitTest targetTest;
 
     void OnEnable() {
-        targetTest = target as SimpleMicroQuiskitTest;
+        targetTest = target as SimpleMicroQiskitTest;
     }
 
     public override void OnInspectorGUI() {
