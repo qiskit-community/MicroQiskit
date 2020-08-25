@@ -12,7 +12,7 @@ public class MicroQiskitExample
     {
         QuantumCircuit circuit = new QuantumCircuit(2, 2);
 
-        MicroQuiskitSimulator simulator = new MicroQuiskitSimulator();
+        MicroQiskitSimulator simulator = new MicroQiskitSimulator();
 
         circuit.H(0);
         circuit.CX(0, 1);

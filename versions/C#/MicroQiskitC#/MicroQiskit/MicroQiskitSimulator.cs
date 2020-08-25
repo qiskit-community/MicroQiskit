@@ -7,7 +7,7 @@ namespace Qiskit
     /// Class to simulate a Quantum Circuit directly in C# same way as MicroQiskit does
     /// Uses basic constructor is not static in order to easy change simulators (Inheriting from SimulatorBase)
     /// </summary>
-    public class MicroQuiskitSimulator : SimulatorBase
+    public class MicroQiskitSimulator : SimulatorBase
     {
         /// <summary>
         /// Calculate the amplitude for a given circuit by simulating it directly in C#
