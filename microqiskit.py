@@ -47,6 +47,10 @@ class QuantumCircuit:
     '''Applies a cx gate to the given source and target qubits.'''
     self.data.append(('cx',s,t))
   
+  def crx(self,theta,s,t):
+    '''Applies a crx gate to the given source and target qubits.'''
+    self.data.append(('crx',theta,s,t))
+  
   def measure(self,q,b):
     '''Applies an measure gate to the given qubit and bit.'''
     assert b<self.num_clbits, 'Index for output bit out of range.'
@@ -130,10 +134,15 @@ def simulate(qc,shots=1024,get='counts'):
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
     
-    elif gate[0]=='cx': # This is the only two qubit gate recognized by the simulator.
+    elif gate[0] in ['cx','crx']: # These are the only two qubit gates recognized by the simulator.
       
       # Get the source and target qubits
-      [s,t] = gate[1:]
+      if gate[0]=='cx': 
+        [s,t] = gate[1:]
+      else:
+        theta = gate[1]
+        [s,t] = gate[2:]
+
 
       # Also get them sorted as highest and lowest
       [l,h] = sorted([s,t])
@@ -146,8 +155,10 @@ def simulate(qc,shots=1024,get='counts'):
           for i2 in range(2**(qc.num_qubits-h-1)):
             b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**s # Index corresponding to bit string for which digit `s` is `1` and digit `t` is '0'.
             b1=b0+2**t  # Index corresponding to the same bit string except that digit `t` is '1'.
-            k[b0],k[b1]=k[b1],k[b0] # Flip the values.
-  
+            if gate[0]=='cx':
+                k[b0],k[b1]=k[b1],k[b0] # Flip the values.
+            else:
+                k[b0],k[b1]=turn(k[b0],k[b1],theta) # Perform the rotation.
   
   # Now for the outputs.
     
