@@ -10,6 +10,7 @@ class QuantumCircuit:
   def __add__(self,self2):
     self3=QuantumCircuit(max(self.num_qubits,self2.num_qubits),max(self.num_clbits,self2.num_clbits))
     self3.data=self.data+self2.data
+    self3.name = self.name
     return self3
   def initialize(self,k):
     self.data[:] = [] 
@@ -22,6 +23,8 @@ class QuantumCircuit:
     self.data.append(('h',q))
   def cx(self,s,t):
     self.data.append(('cx',s,t))
+  def crx(self,theta,s,t):
+    self.data.append(('crx',theta,s,t))
   def measure(self,q,b):
     assert b<self.num_clbits, 'Index for output bit out of range.'
     assert q<self.num_qubits, 'Index for qubit out of range.'
@@ -69,15 +72,22 @@ def simulate(qc,shots=1024,get='counts'):
           else: 
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
-    elif gate[0]=='cx': 
-      [s,t] = gate[1:]
+    elif gate[0] in ['cx','crx']: 
+      if gate[0]=='cx': 
+        [s,t] = gate[1:]
+      else:
+        theta = gate[1]
+        [s,t] = gate[2:]
       [l,h] = sorted([s,t])
       for i0 in range(2**l):
         for i1 in range(2**(h-l-1)):
           for i2 in range(2**(qc.num_qubits-h-1)):
             b0=i0+2**(l+1)*i1+2**(h+1)*i2+2**s 
             b1=b0+2**t  
-            k[b0],k[b1]=k[b1],k[b0] 
+            if gate[0]=='cx':
+                k[b0],k[b1]=k[b1],k[b0] 
+            else:
+                k[b0],k[b1]=turn(k[b0],k[b1],theta) 
   if get=='statevector':
     return k
   else:
