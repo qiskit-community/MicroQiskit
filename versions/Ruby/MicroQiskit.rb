@@ -1,8 +1,8 @@
 class QuantumCircuit
 
-  attr_accessor :num_qubits
-  attr_accessor :num_clbits
-  attr_accessor :data
+  attr_reader :num_qubits
+  attr_reader :num_clbits
+  attr_reader :data
 
   def initialize(n, m)
     @num_qubits = n
@@ -87,9 +87,7 @@ def simulate(qc, shots, get)
 
   outputMap = Array.new
 
-  idx = 0
-  while idx < qc.data.length()
-    gate = qc.data[idx]
+  for gate in qc.data
     if gate[0] == 'm'
       outputMap[gate[2]] = gate[1]
     elsif gate[0] == 'x' || gate[0] == 'h' || gate[0] == 'rx'
@@ -152,7 +150,6 @@ def simulate(qc, shots, get)
         i0 = i0 + 1
       end
     end
-    idx = idx + 1
   end
 
   if get == 'statevector'
@@ -165,23 +162,14 @@ def simulate(qc, shots, get)
       idx_numq = idx_numq + 1
     end
 
-    i = 0
-    while i < qc.data.length()
-      gate = qc.data[i]
-      
-      j = 0
-      while j < qc.num_qubits
+    for gate in qc.data      
+      for j in (0..qc.num_qubits)
         if gate.last == j && m[j]
           puts 'Incorrect or missing measure command'
         end
         m[j] = (gate[0] == 'm' && gate[1] == j && gate[2] == j)
-        j = j + 1
       end
-        
-
-      i = i + 1
     end
-
 
     probs = []
     i = 0
@@ -208,10 +196,8 @@ def simulate(qc, shots, get)
             padStr = padStr[1, qc.num_qubits]
             rawOut = padStr + bitStr
             outList = []
-            i = 0
-            while i < qc.num_clbits
+            for i in (0..qc.num_clbits)
               outList.push('0')
-              i = i + 1
             end
             
             for bit in outputMap
