@@ -90,7 +90,6 @@ def simulate(qc, shots, get)
   idx = 0
   while idx < qc.data.length()
     gate = qc.data[idx]
-
     if gate[0] == 'm'
       outputMap[gate[2]] = gate[1]
     elsif gate[0] == 'x' || gate[0] == 'h' || gate[0] == 'rx'
@@ -101,14 +100,14 @@ def simulate(qc, shots, get)
         while i1 < 2**(qc.num_qubits - j - 1)
           b0 = i0 + 2**(j+1) * i1
           b1 = b0 + 2**j
-
+          
           if gate[0] == 'x'
             temp0 = k[b0]
             temp1 = k[b1]
             k[b0] = temp1
             k[b1] = temp0
           elsif gate[0] == 'h'
-            sup = superpose(k[b0], k[b1-1]) #TODO: For some reason k[b1] does not exist, which is wrong
+            sup = superpose(k[b0], k[b1])
             k[b0] = sup[0]
             k[b1] = sup[1]
           else
@@ -134,7 +133,7 @@ def simulate(qc, shots, get)
 
         i1 = 0
         while i1 < 2**(h - l - 1)
-
+          
           i2 = 0
           while i2 < 2**(qc.num_qubits - h - 1)
             b0 = i0 + 2**(l + 1) * i1 + 2**(h + 1) * i2 + 2**s
@@ -153,107 +152,98 @@ def simulate(qc, shots, get)
         i0 = i0 + 1
       end
     end
+    idx = idx + 1
+  end
 
-    if get == 'statevector'
-      return k
-    else
-      m = []
-      idx_numq = 0
-      while idx_numq < qc.num_qubits
-        m.push(false)
-        idx_numq = idx_numq + 1
-      end
-
-      i = 0
-      while i < qc.data.length()
-        gate = qc.data[i]
-
-        j = 0
-        while j < qc.num_qubits
-          if gate.last == j && m[j]
-            puts 'Incorrect or missing measure command'
-          end
-          m[j] = (gate[0] == 'm' && gate[1] == j && gate[2] == j)
-          j = j + 1
-        end
-
-
-        i = i + 1
-      end
-
-
-      probs = []
-      i = 0
-      #puts 'k length'
-      #puts k.length()
-      #puts k
-      # TODO: undefined method `[]' for nil:NilClass
-      while i < k.length()
-        puts i
-        puts k[i][0].class
-        puts k[i][1].class
-        probs.push(k[i][0]**2 + k[i][1]**2)
-        i = i + 1
-      end
-
-      if get == 'counts' || get == 'memory'
-        me = []
-
-        idx_shots = 0
-        while idx_shots < shots
-          cumu = 0.0
-          un = true
-          r = rand()
-
-          j = 0
-          while j < probs.length()
-            p = probs[j]
-            cumu = cumu + p
-            if r < cumu && un
-              bitStr = j.to_s(2)
-              padStr = (10**(qc.num_qubits - bitStr.length())).to_s
-              padStr = padStr[1, qc.num_qubits]
-              rawOut = padStr + bitStr
-              outList = []
-              i = 0
-              while i < qc.num_clbits
-                outList.push('0')
-                i = i + 1
-              end
-
-              for bit in outputMap
-                outList[qc.num_clbits - 1 - bit] = rawOut[qc.num_qubits - 1 - outputMap[bit]]
-              end
-
-              out = outList.join("")
-              me.push(out)
-              un = false
-            end
-
-            j = j + 1
-          end
-
-          idx_shots = idx_shots + 1
-        end
-
-      elsif get == 'memory'
-        return m
-      else
-        counts = Hash.new
-        meIdx = 0
-        while meIdx < me.length()
-          out = me[meIdx]
-          if counts[out]
-            counts[out] = counts[out] + 1
-          else
-            counts[out] = 1
-          end
-          meIdx = meIdx + 1
-        end
-        return counts
-      end
+  if get == 'statevector'
+    return k
+  else
+    m = []
+    idx_numq = 0
+    while idx_numq < qc.num_qubits
+      m.push(false)
+      idx_numq = idx_numq + 1
     end
 
-    idx = idx + 1
+    i = 0
+    while i < qc.data.length()
+      gate = qc.data[i]
+      
+      j = 0
+      while j < qc.num_qubits
+        if gate.last == j && m[j]
+          puts 'Incorrect or missing measure command'
+        end
+        m[j] = (gate[0] == 'm' && gate[1] == j && gate[2] == j)
+        j = j + 1
+      end
+        
+
+      i = i + 1
+    end
+
+
+    probs = []
+    i = 0
+    while i < k.length()
+      probs.push(k[i][0]**2 + k[i][1]**2)
+      i = i + 1
+    end
+
+    if get == 'counts' || get == 'memory'
+      me = []
+      idx_shots = 0
+      while idx_shots < shots
+        cumu = 0.0
+        un = true
+        r = rand()
+
+        j = 0
+        while j < probs.length()
+          p = probs[j]
+          cumu = cumu + p
+          if r < cumu && un
+            bitStr = j.to_s(2)
+            padStr = (10**(qc.num_qubits - bitStr.length())).to_s
+            padStr = padStr[1, qc.num_qubits]
+            rawOut = padStr + bitStr
+            outList = []
+            i = 0
+            while i < qc.num_clbits
+              outList.push('0')
+              i = i + 1
+            end
+            
+            for bit in outputMap
+              outList[qc.num_clbits - 1 - bit] = rawOut[qc.num_qubits - 1 - outputMap[bit]]
+            end
+            
+            out = outList.join("")
+            me.push(out)
+            un = false
+          end
+
+          j = j + 1
+        end
+        idx_shots = idx_shots + 1
+      end
+    end
+    
+    if get == 'memory'
+      return m
+    else
+      counts = Hash.new
+      meIdx = 0
+      while meIdx < me.length()
+        out = me[meIdx]
+        if counts[out]
+          counts[out] = counts[out] + 1
+        else
+          counts[out] = 1
+        end
+        meIdx = meIdx + 1
+      end
+      return counts
+    end
   end
 end
