@@ -96,12 +96,12 @@ def simulate(qc, shots, get)
     elsif gate[0] == 'x' || gate[0] == 'h' || gate[0] == 'rx'
       j = gate.last
       i0 = 0
-      while i0 < 2^j
+      while i0 < 2**j
         i1 = 0
-        while i1 < 2^(qc.num_qubits - j - 1)
-          b0 = i0 + 2^(j+1) * i1
-          b1 = b0 + 2^j
-          
+        while i1 < 2**(qc.num_qubits - j - 1)
+          b0 = i0 + 2**(j+1) * i1
+          b1 = b0 + 2**j
+
           if gate[0] == 'x'
             temp0 = k[b0]
             temp1 = k[b1]
@@ -130,15 +130,15 @@ def simulate(qc, shots, get)
       h = [s, t].max
 
       i0 = 0
-      while i0 < 2^l
+      while i0 < 2**l
 
         i1 = 0
-        while i1 < 2^(h - l - 1)
-          
+        while i1 < 2**(h - l - 1)
+
           i2 = 0
-          while i2 < 2^(qc.num_qubits - h - 1)
-            b0 = i0 + 2^(l + 1) * i1 + 2^(h + 1) * i2 + 2^s
-            b1 = b0 + 2^t
+          while i2 < 2**(qc.num_qubits - h - 1)
+            b0 = i0 + 2**(l + 1) * i1 + 2**(h + 1) * i2 + 2**s
+            b1 = b0 + 2**t
             tmp0 = k[b0]
             tmp1 = k[b1]
             k[b0] = tmp1
@@ -167,7 +167,7 @@ def simulate(qc, shots, get)
       i = 0
       while i < qc.data.length()
         gate = qc.data[i]
-        
+
         j = 0
         while j < qc.num_qubits
           if gate.last == j && m[j]
@@ -176,7 +176,7 @@ def simulate(qc, shots, get)
           m[j] = (gate[0] == 'm' && gate[1] == j && gate[2] == j)
           j = j + 1
         end
-          
+
 
         i = i + 1
       end
@@ -211,7 +211,7 @@ def simulate(qc, shots, get)
             cumu = cumu + p
             if r < cumu && un
               bitStr = j.to_s(2)
-              padStr = (10^(qc.num_qubits - bitStr.length())).to_s
+              padStr = (10**(qc.num_qubits - bitStr.length())).to_s
               padStr = padStr[1, qc.num_qubits]
               rawOut = padStr + bitStr
               outList = []
@@ -235,7 +235,7 @@ def simulate(qc, shots, get)
 
           idx_shots = idx_shots + 1
         end
-      
+
       elsif get == 'memory'
         return m
       else
@@ -257,16 +257,3 @@ def simulate(qc, shots, get)
     idx = idx + 1
   end
 end
-
-
-psiMinus = QuantumCircuit.new(2, 2);
-psiMinus.h(0);
-psiMinus.x(1);
-psiMinus.cx(0, 1);
-psiMinus.z(1);
-psiMinus.measure(0, 0);
-psiMinus.measure(1, 1);
-psiMinusStatevector = simulate(psiMinus, 0, 'statevector');
-puts 'psiMinusStatevector: '
-puts psiMinusStatevector
-puts simulate(psiMinus, 5, 'counts')
