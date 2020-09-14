@@ -1,4 +1,18 @@
-﻿using System;
+﻿// -*- coding: utf-8 -*-
+
+// This code is part of Qiskit.
+//
+// (C) Copyright IBM 2020.
+//
+// This code is licensed under the Apache License, Version 2.0. You may
+// obtain a copy of this license in the LICENSE.txt file in the root directory
+// of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
+//
+// Any modifications or derivative works of this code must retain this
+// copyright notice, and modified files need to carry a notice indicating
+// that they have been altered from the originals.using System;
+
+using System;
 using System.Collections.Generic;
 #if Unity_Editor || UNITY_STANDALONE
 using UnityEngine;
@@ -19,20 +33,35 @@ namespace Qiskit
         public int NumberOfOutputs;
         public List<Gate> Gates;
         public ComplexNumber[] Amplitudes;
+        public int AmplitudeLength;
+        //public Vector2Int Dimensions;
+        public string DimensionString;
+        public double OriginalSum;
 
-        public QuantumCircuit(int numberOfQuibits, int numberOfOutputs)
+        public QuantumCircuit(int numberOfQuibits, int numberOfOutputs, bool initializeAmplitudes=false)
         {
             Gates = new List<Gate>();
             NumberOfQubits = numberOfQuibits;
             NumberOfOutputs = numberOfOutputs;
-            Amplitudes = new ComplexNumber[Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits))];
+            AmplitudeLength = MathHelper.IntegerPower(2, NumberOfQubits);
+
+            if (initializeAmplitudes)
+            {
+                Amplitudes = new ComplexNumber[AmplitudeLength];
+
+            }
         }
 
         public void InitializeValues(List<double> values)
         {
-            if (values.Count > Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)))
+            if (Amplitudes==null  || Amplitudes.Length!=AmplitudeLength)
             {
-                LogError("To many values " + values.Count + " while there are only " + Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)) + " qubits");
+                Amplitudes = new ComplexNumber[AmplitudeLength];
+            }
+
+            if (values.Count > AmplitudeLength)
+            {
+                LogError("To many values " + values.Count + " while there are only " + AmplitudeLength + " qubits");
                 return;
             }
             for (int i = 0; i < values.Count; i++)
@@ -43,9 +72,14 @@ namespace Qiskit
 
         public void InitializeValues(List<ComplexNumber> values)
         {
-            if (values.Count > Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)))
+            if (Amplitudes == null || Amplitudes.Length != AmplitudeLength)
             {
-                LogError("To many values " + values.Count + " while there are only " + Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)) + " qubits");
+                Amplitudes = new ComplexNumber[AmplitudeLength];
+            }
+
+            if (values.Count > AmplitudeLength)
+            {
+                LogError("To many values " + values.Count + " while there are only " + AmplitudeLength + " qubits");
                 return;
             }
             for (int i = 0; i < values.Count; i++)
@@ -56,9 +90,14 @@ namespace Qiskit
 
         public void InitializeValues(double[] values)
         {
-            if (values.Length > Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)))
+            if (Amplitudes == null || Amplitudes.Length != AmplitudeLength)
             {
-                LogError("To many values " + values.Length + " while there are only " + Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)) + " qubits");
+                Amplitudes = new ComplexNumber[AmplitudeLength];
+            }
+
+            if (values.Length > AmplitudeLength)
+            {
+                LogError("To many values " + values.Length + " while there are only " + AmplitudeLength + " qubits");
                 return;
             }
             for (int i = 0; i < values.Length; i++)
@@ -68,15 +107,21 @@ namespace Qiskit
         }
         public void InitializeValues(ComplexNumber[] values)
         {
-            if (values.Length > Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)))
+            //Amplitudes = new ComplexNumber[AmplitudeLength];
+
+            if (values.Length > AmplitudeLength)
             {
-                LogError("To many values " + values.Length + " while there are only " + Mathf.RoundToInt(Mathf.Pow(2, NumberOfQubits)) + " qubits");
+                LogError("To many values " + values.Length + " while there are only " + AmplitudeLength + " qubits");
                 return;
             }
+
+            /*
             for (int i = 0; i < values.Length; i++)
             {
                 Amplitudes[i] = values[i];
             }
+            */
+            Amplitudes = values;            
         }
 
 
@@ -129,6 +174,19 @@ namespace Qiskit
             Gates.Add(gate);
         }
 
+        public void CRX(int controlQubit, int targetQubit, double rotation)
+        {
+            Gate gate = new Gate
+            {
+                CircuitType = CircuitType.CRX,
+                First = controlQubit,
+                Second = targetQubit,
+                Theta= rotation          
+
+            };
+            Gates.Add(gate);
+        }
+
         public void Measure(int output, int qubit)
         {
             Gate gate = new Gate
@@ -173,6 +231,11 @@ namespace Qiskit
         public double ProbabilitySum()
         {
             double sum = 0;
+            if (Amplitudes==null || Amplitudes.Length==0)
+            {
+                return 0;
+            }
+
             for (int i = 0; i < Amplitudes.Length; i++)
             {
                 sum += Amplitudes[i].Real * Amplitudes[i].Real + Amplitudes[i].Complex * Amplitudes[i].Complex;
@@ -188,8 +251,16 @@ namespace Qiskit
 
         public void Normalize(double sum)
         {
+            if (sum<MathHelper.Eps)
+            {
+                LogError("Sum is 0");
+                return;
+            }
+
+
             if (sum < 1 - MathHelper.Eps || sum > 1 + MathHelper.Eps)
             {
+                OriginalSum = sum;
                 sum = Math.Sqrt(sum);
 
                 for (int i = 0; i < Amplitudes.Length; i++)
