@@ -83,7 +83,7 @@ class QuantumCircuit:
     self.x(q)
 
 
-def simulate(qc,shots=1024,get='counts'):
+def simulate(qc,shots=1024,get='counts',noise_model=[]):
   '''Simulates the given circuit `qc`, and outputs the results in the form specified by `shots` and `get`.'''
   
   def superpose(x,y):
@@ -98,6 +98,12 @@ def simulate(qc,shots=1024,get='counts'):
   # Initialize a 2^n element statevector. Complex numbers are expressed as a list of two real numbers.
   k = [[0,0] for _ in range(2**qc.num_qubits)] # First with zeros everywhere.
   k[0] = [1.0,0.0] # Then a single 1 to create the all |0> state.
+
+  # if there is a noise model, it should be a list of qc.num_qubits measurement error probabilities
+  # if it is just a singe probability, turn it into such a list
+  if noise_model:
+    if type(noise_model)==float:
+       noise_model = [noise_model]*qc.num_qubits
 
   # The `outputnum_clbitsap` dictionary keeps track of which qubits are read out to which output bits
   outputnum_clbitsap = {}
@@ -171,6 +177,19 @@ def simulate(qc,shots=1024,get='counts'):
     # To calculate outputs, we convert the statevector into a list of probabilities.
     # Here `probs[j]` is the probability for the output bit string to be the n bit representation of j.
     probs = [e[0]**2+e[1]**2 for e in k]
+    
+    if noise_model:
+      for j in range(qc.num_qubits):
+        p_meas = noise_model[j]
+        for i0 in range(2**j):
+          for i1 in range(2**(qc.num_qubits-j-1)):
+            b0=i0+2**(j+1)*i1 # Index corresponding to bit string for which the `j`th digit is '0'.
+            b1=b0+2**j # Index corresponding to the same bit string except that the `j`th digit is '1'.
+            # change the probs to reproduce the effect of a measurement error
+            p0 = probs[b0]
+            p1 = probs[b1]
+            probs[b0] = (1-p_meas)*p0 + p_meas*p1
+            probs[b1] = (1-p_meas)*p1 + p_meas*p0
         
     # This can be output directly (as with Statevector or DensityMatrix in Qiskit
     if get=='probabilities_dict':
