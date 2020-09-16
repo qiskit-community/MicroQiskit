@@ -178,6 +178,7 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
     # Here `probs[j]` is the probability for the output bit string to be the n bit representation of j.
     probs = [e[0]**2+e[1]**2 for e in k]
     
+    # If there is a noise model, apply its effects
     if noise_model:
       for j in range(qc.num_qubits):
         p_meas = noise_model[j]
