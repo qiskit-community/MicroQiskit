@@ -202,7 +202,14 @@ def test_reorder ():
     qc.measure(0,3)
     counts = simulate(qc,shots=shots,get='counts')
     assert counts['0111']==shots
-        
+    
+def test_noise ():
+    qc = QuantumCircuit(2,2)
+    p = simulate(qc,get='probabilities_dict',noise_model=[0.1,0.2])
+    correct_p = {'00': 0.7200000000000001,'01': 0.08000000000000002,'10': 0.18000000000000002,'11': 0.020000000000000004}
+    for out in correct_p:
+        assert p[out]==correct_p[out]
+    
 test_trig()
 test_x()
 test_h()
@@ -212,5 +219,6 @@ test_memory()
 test_counts()
 test_add()
 test_multiqubit()
+test_noise ()
 
 print('Tests passed!')

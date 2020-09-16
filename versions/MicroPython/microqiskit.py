@@ -42,7 +42,7 @@ class QuantumCircuit:
   def y(self,q):
     self.rz(pi,q)
     self.x(q)
-def simulate(qc,shots=1024,get='counts'):
+def simulate(qc,shots=1024,get='counts',noise_model=[]):
   def superpose(x,y):
     return [r2*(x[j]+y[j])for j in range(2)],[r2*(x[j]-y[j])for j in range(2)]
   def turn(x,y,theta):
@@ -50,6 +50,9 @@ def simulate(qc,shots=1024,get='counts'):
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
   k = [[0,0] for _ in range(2**qc.num_qubits)] 
   k[0] = [1.0,0.0] 
+  if noise_model:
+    if type(noise_model)==float:
+       noise_model = [noise_model]*qc.num_qubits
   outputnum_clbitsap = {}
   for gate in qc.data:
     if gate[0]=='init': 
@@ -92,6 +95,17 @@ def simulate(qc,shots=1024,get='counts'):
     return k
   else:
     probs = [e[0]**2+e[1]**2 for e in k]
+    if noise_model:
+      for j in range(qc.num_qubits):
+        p_meas = noise_model[j]
+        for i0 in range(2**j):
+          for i1 in range(2**(qc.num_qubits-j-1)):
+            b0=i0+2**(j+1)*i1 
+            b1=b0+2**j 
+            p0 = probs[b0]
+            p1 = probs[b1]
+            probs[b0] = (1-p_meas)*p0 + p_meas*p1
+            probs[b1] = (1-p_meas)*p1 + p_meas*p0
     if get=='probabilities_dict':
       return {('{0:0'+str(qc.num_qubits)+'b}').format(j):p for j,p in enumerate(probs)}
     elif get in ['counts', 'memory']:
