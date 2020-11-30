@@ -4,12 +4,10 @@
 using Qiskit;
 
 
-public class MicroQiskitExample 
-{
+public class MicroQiskitExample {
 
     //Simple example to generate the 2 qubit state of a bell pair
-    public void GenerateBellPair()
-    {
+    public void GenerateBellPair() {
         QuantumCircuit circuit = new QuantumCircuit(2, 2);
 
         MicroQiskitSimulator simulator = new MicroQiskitSimulator();
