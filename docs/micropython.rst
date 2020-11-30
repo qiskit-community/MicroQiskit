@@ -6,7 +6,7 @@ See https://qiskit.org for more on Qiskit.
 
 .. module:: microqiskit
 
-.. function:: simulate(qc,shots=1024,get='counts'):
+.. function:: simulate(qc,shots=1024,get='counts',noise_model=[]):
 
     Runs the quantum circuit ``qc``. Results are given from multiple runs, the
     number of which is specified by ``shots``. The type of output is specified
@@ -22,6 +22,11 @@ See https://qiskit.org for more on Qiskit.
     For a ``'statevector'`` output: Complex numbers are specified as a two
     element list instead of standard Python complex number notation. So a
     number ``a+bj`` will become ``[a,b]``.
+    
+    A limited capacity for adding noise is implemented in MicroQiskit. Specifically,
+    bit flip errors can be added at the very end of the circuit to all qubits. To
+    apply this, supply a list of the desired error probabilities for each qubit as
+    the ``noise_model`` argument.
         
 
 .. class:: QuantumCircuit(num_qubits, num_clbits=0)
