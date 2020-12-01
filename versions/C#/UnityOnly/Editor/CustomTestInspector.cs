@@ -19,23 +19,19 @@ public class CustomTestInspector : Editor {
 
         // Spawn buttons
 
-        if (GUILayout.Button("Initialize the Simulator"))
-        {
+        if (GUILayout.Button("Initialize the Simulator")) {
             targetTest.SetSimulator();
         }
 
-        if (GUILayout.Button("Initialize the test"))
-        {
+        if (GUILayout.Button("Initialize the test")) {
             targetTest.InitTest();
         }
 
-        if (GUILayout.Button("Normalize"))
-        {
+        if (GUILayout.Button("Normalize")) {
             targetTest.Normalize();
         }
 
-        if (GUILayout.Button("Start the test"))
-        {
+        if (GUILayout.Button("Start the test")) {
             targetTest.StartTest();
         }
 

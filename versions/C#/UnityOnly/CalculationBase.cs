@@ -17,8 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CalculationBase : MonoBehaviour
-{
+public class CalculationBase : MonoBehaviour {
 
     //[HideInInspector]
     public double[] Probabilities;
@@ -29,11 +28,9 @@ public class CalculationBase : MonoBehaviour
     [HideInInspector]
     public Action CalculationFinished;
 
-    public virtual void Calculate()
-    {
+    public virtual void Calculate() {
 
-        if (CalculationFinished!=null)
-        {
+        if (CalculationFinished != null) {
             CalculationFinished.Invoke();
         }
     }
