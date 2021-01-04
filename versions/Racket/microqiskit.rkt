@@ -50,8 +50,8 @@
       (set! data (append data (list (list "crx" theta s t)))))
 
     (define/public (measure q b)
-      (if (< b num-clbits) "Index for output bit out of range." "Fine")
-      (if (< q num-qubits) "Index for qubit out of range." "Fine")
+      (if (< b num-clbits) "Index for output bit out of range." "Ready")
+      (if (< q num-qubits) "Index for qubit out of range." "Ready")
       (set! data (append data (list (list "m" q b)))))
 
     (define/public (rz theta q)
@@ -95,7 +95,7 @@
 
   (define outputnum-clbitsap (make-hash))
 
-  (define-values (j b0 b1 theta s t l h) (values 0 0 0 0 0 0 0 0)) ; just in case
+  (define-values (j b0 b1 theta s t l h) (values 0 0 0 0 0 0 0 0))
 
   (define probs null)
   (define m null)
@@ -114,7 +114,7 @@
         (if (list? (first (second gate)))
             (set! k (second gate))
             
-            (set! k (foldr (λ (i res) ; else
+            (set! k (foldr (λ (i res)
                              (cons (list i 0) res))
                            '() (second gate))))]
      [(equal? (first gate) "m")
@@ -166,7 +166,6 @@
                            k))
         (cond
           [(equal? get "prob-dict")
-           ; (display "arg: prob-dict\n")
            (set! finalized-hash (make-hash))
            (for ([j (range (length probs))]
                  [p probs])
@@ -175,7 +174,6 @@
            ]
 
           [(member get '("counts" "memory"))
-           ; (displayln "arg: counts\n")
            (set! m (make-list (send qc nqubits) #f))
            (for ([gate (send qc show-data)])
              (for ([j (range (send qc nqubits))])
@@ -210,7 +208,7 @@
 
            (if (equal? get "memory")
                m
-               ;; else
+
                (begin
                  (set! counts (make-hash))
 
