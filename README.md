@@ -28,7 +28,7 @@ Installation guides for the various versions of MicroQiskit can be found in the 
 * [C++](versions/C++/README.md)
 * [C#](versions/C%23/README.md)
 * [Ruby](versions/Ruby/README.md)
-* [Racket](versions/Racket/README.md)
+* [Racket](versions/Racket/README.org)
 
 
 ### Template Version
