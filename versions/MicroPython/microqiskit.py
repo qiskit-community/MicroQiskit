@@ -19,6 +19,8 @@ class QuantumCircuit:
     self.data.append(('x',q))
   def rx(self,theta,q):
     self.data.append(('rx',theta,q))
+  def rz(self,theta,q):
+    self.data.append(('rz',theta,q))
   def h(self,q):
     self.data.append(('h',q))
   def cx(self,s,t):
@@ -29,10 +31,6 @@ class QuantumCircuit:
     assert b<self.num_clbits, 'Index for output bit out of range.'
     assert q<self.num_qubits, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
-  def rz(self,theta,q):
-    self.h(q)
-    self.rx(theta,q)
-    self.h(q)
   def ry(self,theta,q):
     self.rx(pi/2,q)
     self.rz(theta,q)
@@ -48,6 +46,9 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
   def turn(x,y,theta):
     theta = float(theta)
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
+  def phaseturn(x,y,theta):
+     theta = float(theta)
+     return [[x[0]*cos(theta/2) - x[1]*sin(-theta/2),x[1]*cos(theta/2) + x[0]*sin(-theta/2)],[y[0]*cos(theta/2) - y[1]*sin(+theta/2),y[1]*cos(theta/2) + y[0]*sin(+theta/2)]]   
   k = [[0,0] for _ in range(2**qc.num_qubits)] 
   k[0] = [1.0,0.0] 
   if noise_model:
@@ -62,7 +63,7 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
         k = [[e,0] for e in gate[1]]
     elif gate[0]=='m': 
       outputnum_clbitsap[gate[2]] = gate[1]
-    elif gate[0] in ['x','h','rx']: 
+    elif gate[0] in ['x','h','rx','rz']: 
       j = gate[-1] 
       for i0 in range(2**j):
         for i1 in range(2**(qc.num_qubits-j-1)):
@@ -72,9 +73,12 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
             k[b0],k[b1]=k[b1],k[b0]
           elif gate[0]=='h': 
             k[b0],k[b1]=superpose(k[b0],k[b1])
-          else: 
+          elif gate[0]=='rx': 
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
+          elif gate[0]=='rz': 
+            theta = gate[1]
+            k[b0],k[b1]=phaseturn(k[b0],k[b1],theta) 
     elif gate[0] in ['cx','crx']: 
       if gate[0]=='cx': 
         [s,t] = gate[1:]

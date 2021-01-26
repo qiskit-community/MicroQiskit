@@ -38,6 +38,10 @@ class QuantumCircuit:
   def rx(self,theta,q):
     '''Applies an rx gate to the given qubit by the given angle.'''
     self.data.append(('rx',theta,q))
+    
+  def rz(self,theta,q):
+    '''Applies an rz gate to the given qubit by the given angle.'''
+    self.data.append(('rz',theta,q))
   
   def h(self,q):
     '''Applies an h gate to the given qubit.'''
@@ -56,13 +60,6 @@ class QuantumCircuit:
     assert b<self.num_clbits, 'Index for output bit out of range.'
     assert q<self.num_qubits, 'Index for qubit out of range.'
     self.data.append(('m',q,b))
-  
-  def rz(self,theta,q):
-    '''Applies an rz gate to the given qubit by the given angle.'''
-    # This gate is constructed from `h` and `rx`.
-    self.h(q)
-    self.rx(theta,q)
-    self.h(q)
   
   def ry(self,theta,q):
     '''Applies an ry gate to the given qubit by the given angle.'''
@@ -94,6 +91,11 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
     '''For two elements of the statevector, x and y, return cos(theta/2)*x - i*sin(theta/2)*y and cos(theta/2)*y - i*sin(theta/2)*x'''
     theta = float(theta)
     return [x[0]*cos(theta/2)+y[1]*sin(theta/2),x[1]*cos(theta/2)-y[0]*sin(theta/2)],[y[0]*cos(theta/2)+x[1]*sin(theta/2),y[1]*cos(theta/2)-x[0]*sin(theta/2)]
+
+  def phaseturn(x,y,theta):
+     '''For two elements of the statevector, x and y, return e^(-i theta/2)*x and e^(i theta/2)*y'''
+     theta = float(theta)
+     return [[x[0]*cos(theta/2) - x[1]*sin(-theta/2),x[1]*cos(theta/2) + x[0]*sin(-theta/2)],[y[0]*cos(theta/2) - y[1]*sin(+theta/2),y[1]*cos(theta/2) + y[0]*sin(+theta/2)]]   
   
   # Initialize a 2^n element statevector. Complex numbers are expressed as a list of two real numbers.
   k = [[0,0] for _ in range(2**qc.num_qubits)] # First with zeros everywhere.
@@ -121,7 +123,7 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
     elif gate[0]=='m': # For measurement, keep a record of which bit goes with which qubit.
       outputnum_clbitsap[gate[2]] = gate[1]
     
-    elif gate[0] in ['x','h','rx']: # These are the only single qubit gates recognized by the simulator.
+    elif gate[0] in ['x','h','rx','rz']: # These are the only single qubit gates recognized by the simulator.
       
       j = gate[-1] # The qubit on which these gates act is the final element of the tuple.
   
@@ -136,9 +138,12 @@ def simulate(qc,shots=1024,get='counts',noise_model=[]):
             k[b0],k[b1]=k[b1],k[b0]
           elif gate[0]=='h': # For x, superpose them
             k[b0],k[b1]=superpose(k[b0],k[b1])
-          else: # For rx, construct the superposition required for the given angle
+          elif gate[0]=='rx': # For rx, construct the superposition required for the given angle
             theta = gate[1]
             k[b0],k[b1]=turn(k[b0],k[b1],theta)
+          elif gate[0]=='rz': # For rz, change the phases by the given angle
+            theta = gate[1]
+            k[b0],k[b1]=phaseturn(k[b0],k[b1],theta) 
     
     elif gate[0] in ['cx','crx']: # These are the only two qubit gates recognized by the simulator.
       

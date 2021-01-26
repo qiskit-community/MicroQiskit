@@ -68,6 +68,32 @@ def test_rx():
     qc.h(1)
     assert(simulate(qc,get='statevector')==[[0.4157348061435736, -0.27778511650465676], [0.4903926401925336, 0.0975451610062577], [0.4903926401925336, -0.0975451610062577], [0.4157348061435736, 0.27778511650465676]])
     
+def test_rz():
+    
+    # arbitrary angles
+    tx = 2.8777603974458796
+    tz = 0.5589019778800038
+
+    # an rz rotatation using h*rx*h
+    qcx = QuantumCircuit(1)
+    qcx.rx(tx,0)
+    qcx.h(0)
+    qcx.rx(tz,0)
+    qcx.h(0)
+    ketx = simulate(qcx,get='statevector')
+
+    # a plain rz rotation
+    qcz = QuantumCircuit(1)
+    qcz.rx(tx,0)
+    qcz.rz(tz,0)
+    simulate(qcz,get='statevector')
+    ketz = simulate(qcz,get='statevector')
+    
+    # check they are the same
+    for j in range(2):
+        for k in range(2):
+            assert round(ketx[j][k],3)==round(ketz[j][k],3)
+                
 def test_ry():
     qc = QuantumCircuit(1)
     qc.ry(pi/8,0)
@@ -214,6 +240,8 @@ test_trig()
 test_x()
 test_h()
 test_rx()
+test_rz()
+test_ry
 test_cx()
 test_memory()
 test_counts()
