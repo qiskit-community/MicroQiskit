@@ -38,6 +38,8 @@ int main () {
   // we can use the result to see what the Qiskit syntax would be
   cout << "\nThis circuit could be expressed in Qiskit as:" << endl;
   cout << result.get_qiskit() << endl;
+  
+  // we can use the result to see also what the QASM syntax would be
   cout << "\nThis circuit could be expressed in Qasm as:" << endl;
   cout << result.get_qasm() << endl;
 
