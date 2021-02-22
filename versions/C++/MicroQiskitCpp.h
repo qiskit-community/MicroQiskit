@@ -1,11 +1,14 @@
 /*
 Comments in this file are mostly there to point out differences with the Python version of MicroQiskit.
+Access the lastest official release here: https://github.com/qiskit-community/MicroQiskit/tree/master/versions/C%2B%2B
 
 For comments on what everything is supposed to do, see the Python version of MicroQiskit.
 https://github.com/quantumjim/MicroQiskit/blob/master/microqiskit.py
 https://github.com/qiskit-community/MicroQiskit
 
-The present version MicroQiskit in C++ has been the work of Omar Costa Hamdo and  Dr. James Wootton
+The present version of MicroQiskit in C++ has been the work of Omar Costa Hamdo and  Dr. James Wootton
+
+In development on replit (https://repl.it/@quantum_jim/MicroQiskitC) and on github (https://github.com/omarcostahamido/MicroQiskitCpp).
 */
 #ifndef MICROQISKITCPP_H
 #define MICROQISKITCPP_H
