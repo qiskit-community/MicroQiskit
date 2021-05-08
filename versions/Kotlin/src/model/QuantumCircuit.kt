@@ -55,7 +55,7 @@ class QuantumCircuit(var numberOfQubits: Int, var numberOfOutputs: Int) {
 
     fun probabilitySum(): Double {
         var sum = 0.0
-        amplitudes.forEach { sum += it.real * it.real + it.complex * it.complex }
+        amplitudes.forEach { sum += it.real.pow(2) + it.complex.pow(2) }
         return sum
     }
 
