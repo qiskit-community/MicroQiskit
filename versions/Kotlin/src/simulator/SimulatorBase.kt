@@ -5,9 +5,9 @@ import model.QuantumCircuit
 import util.MathConstants
 import kotlin.math.pow
 
-class SimulatorBase {
+open class SimulatorBase {
 
-    fun simulate(circuit: QuantumCircuit): List<ComplexNumber> {
+    open fun simulate(circuit: QuantumCircuit): List<ComplexNumber> {
         val sum = circuit.probabilitySum()
 
         return if (sum > MathConstants.Eps) {
@@ -27,7 +27,7 @@ class SimulatorBase {
         }
     }
 
-    fun simulateInPlace(circuit: QuantumCircuit): List<ComplexNumber> {
+    open fun simulateInPlace(circuit: QuantumCircuit): List<ComplexNumber> {
         val localAmplitudes = arrayListOf<ComplexNumber>()
         val sum = circuit.probabilitySum()
 
@@ -45,14 +45,25 @@ class SimulatorBase {
         return localAmplitudes
     }
 
-    fun getProbabilities(circuit: QuantumCircuit): List<Double> {
+    open fun getProbabilities(circuit: QuantumCircuit): List<Double> {
         val probabilities = arrayListOf<Double>()
         val length = 2.0.pow(circuit.numberOfQubits).toInt()
         for (i in 0..length) probabilities.add(0.0)
         return probabilities
     }
 
-    fun getProbabilities(amplitudes: List<ComplexNumber>): List<Double> =
+    open fun getProbabilities(amplitudes: List<ComplexNumber>): List<Double> =
         amplitudes.map { it.real.pow(2) + it.complex.pow(2) }
+
+    open fun calculateProbabilities(amplitudes: List<ComplexNumber>, probabilities: List<Double>): List<Double> {
+        val localProbabilities = arrayListOf<Double>()
+        amplitudes.forEach { _ -> localProbabilities.add(0.0) }
+
+        localProbabilities.mapIndexed { index, _ ->
+            amplitudes[index].real.pow(2) + amplitudes[index].complex.pow(2)
+        }
+
+        return localProbabilities
+    }
 
 }
