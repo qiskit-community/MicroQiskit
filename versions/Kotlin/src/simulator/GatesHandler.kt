@@ -10,17 +10,17 @@ import kotlin.math.sin
 class GatesHandler {
 
     fun handleX(amplitudes: List<ComplexNumber>, gate: Gate, numberOfQubits: Int): List<ComplexNumber> {
-        val first = gate.first
-        val firstPow = first.toDouble().pow(2).toInt()
-        val firstPlusPow = (first + 1).toDouble().pow(2).toInt()
-        val opposingPow = (numberOfQubits - first - 1).toDouble().pow(2).toInt()
+        val target = gate.targetQubit
+        val firstPow = 2.0.pow(target).toInt()
+        val firstPlusPow = 2.0.pow(target + 1).toInt()
+        val opposingPow = 2.0.pow(numberOfQubits - target - 1).toInt()
 
         val localAmplitudes = arrayListOf<ComplexNumber>()
-        amplitudes.forEach { localAmplitudes.add(it) }
+        amplitudes.forEach { localAmplitudes.add(it.copy()) }
 
-        for (i in 0..firstPow) {
+        for (i in 0 until firstPow) {
             var posJ = 0
-            for (j in 0..opposingPow) {
+            for (j in 0 until opposingPow) {
                 val pos1 = i + posJ
                 val pos2 = pos1 + firstPow
 
@@ -36,21 +36,21 @@ class GatesHandler {
     }
 
     fun handleRX(amplitudes: List<ComplexNumber>, gate: Gate, numberOfQubits: Int): List<ComplexNumber> {
-        val first = gate.first
-        val firstPow = first.toDouble().pow(2).toInt()
-        val firstPlusPow = (first + 1).toDouble().pow(2).toInt()
-        val opposingPow = (numberOfQubits - first - 1).toDouble().pow(2).toInt()
+        val target = gate.targetQubit
+        val firstPow = 2.0.pow(target).toInt()
+        val firstPlusPow = 2.0.pow(target + 1).toInt()
+        val opposingPow = 2.0.pow(numberOfQubits - target - 1).toInt()
 
         val localAmplitudes = arrayListOf<ComplexNumber>()
-        amplitudes.forEach { localAmplitudes.add(it) }
+        amplitudes.forEach { localAmplitudes.add(it.copy()) }
 
         gate.theta?.let { theta ->
             val cosTheta = cos(theta / 2)
             val sinTheta = sin(theta / 2)
 
-            for (i in 0..firstPow) {
+            for (i in 0 until firstPow) {
                 var posJ = 0
-                for (j in 0..opposingPow) {
+                for (j in 0 until opposingPow) {
                     val pos1 = i + posJ
                     val pos2 = pos1 + firstPow
 
@@ -72,8 +72,8 @@ class GatesHandler {
     }
 
     fun handleCX(amplitudes: List<ComplexNumber>, gate: Gate, numberOfQubits: Int): List<ComplexNumber> {
-        val first = gate.first
-        val second = gate.second ?: 0
+        val target = gate.targetQubit
+        val control = gate.controlQubit ?: 0
 
         var pow1: Int
         val pow2: Int
@@ -82,12 +82,12 @@ class GatesHandler {
         var end3: Int
 
         val localAmplitudes = arrayListOf<ComplexNumber>()
-        amplitudes.forEach { localAmplitudes.add(it) }
+        amplitudes.forEach { localAmplitudes.add(it.copy()) }
 
-        val firstPow: Int = first.toDouble().pow(2).toInt()
-        val secondPow: Int = second.toDouble().pow(2).toInt()
+        val firstPow: Int = 2.0.pow(target).toInt()
+        val secondPow: Int = 2.0.pow(control).toInt()
 
-        if (second < first) {
+        if (control < target) {
             pow1 = secondPow
             pow2Plus = firstPow * 2
             pow2 = firstPow
@@ -98,15 +98,15 @@ class GatesHandler {
         }
 
         val pow1Plus: Int = pow1 * 2
-        val pow3: Int = numberOfQubits.toDouble().pow(2).toInt()
+        val pow3: Int = 2.0.pow(numberOfQubits).toInt()
 
         pow1 += firstPow
 
-        for (posI in firstPow..pow1) {
+        for (posI in firstPow until pow1) {
             end2 = pow2 + posI
-            for (posJ in posI..end2 step pow1Plus) {
+            for (posJ in posI until end2 step pow1Plus) {
                 end3 = pow3 + posJ
-                for (posK in posJ..end3 step pow2Plus) {
+                for (posK in posJ until end3 step pow2Plus) {
                     val pos2 = posK + secondPow
                     val old = localAmplitudes[posK]
                     localAmplitudes[posK] = localAmplitudes[pos2]
@@ -119,8 +119,8 @@ class GatesHandler {
     }
 
     fun handleCRX(amplitudes: List<ComplexNumber>, gate: Gate, numberOfQubits: Int): List<ComplexNumber> {
-        val first = gate.first
-        val second = gate.second ?: 0
+        val target = gate.targetQubit
+        val control = gate.controlQubit ?: 0
 
         gate.theta?.let { theta ->
             val cosTheta = cos(theta / 2)
@@ -131,12 +131,12 @@ class GatesHandler {
             var end2: Int
 
             val localAmplitudes = arrayListOf<ComplexNumber>()
-            amplitudes.forEach { localAmplitudes.add(it) }
+            amplitudes.forEach { localAmplitudes.add(it.copy()) }
 
-            val firstPow: Int = first.toDouble().pow(2).toInt()
-            val secondPow: Int = second.toDouble().pow(2).toInt()
+            val firstPow: Int = 2.0.pow(target).toInt()
+            val secondPow: Int = 2.0.pow(control).toInt()
 
-            if (second < first) {
+            if (control < target) {
                 pow1 = secondPow
                 pow2Plus = firstPow * 2
                 pow2 = firstPow
@@ -147,15 +147,15 @@ class GatesHandler {
             }
 
             val pow1Plus: Int = pow1 * 2
-            val pow3: Int = numberOfQubits.toDouble().pow(2).toInt()
+            val pow3: Int = 2.0.pow(numberOfQubits).toInt()
 
             pow1 += firstPow
 
-            for (posI in firstPow..pow1) {
+            for (posI in firstPow until pow1) {
                 end2 = pow2 + posI
-                for (posJ in posI..end2 step pow1Plus) {
+                for (posJ in posI until end2 step pow1Plus) {
                     val end3 = pow3 + posJ
-                    for (posK in posJ..end3 step pow2Plus) {
+                    for (posK in posJ until end3 step pow2Plus) {
                         val pos2 = posK + secondPow
 
                         val c1 = localAmplitudes[posK]
@@ -175,26 +175,26 @@ class GatesHandler {
     }
 
     fun handleH(amplitudes: List<ComplexNumber>, gate: Gate, numberOfQubits: Int): List<ComplexNumber> {
-        val first = gate.first
-        val firstPow = first.toDouble().pow(2).toInt()
-        val firstPlusPow = (first + 1).toDouble().pow(2).toInt()
-        val opposingPow = (numberOfQubits - first - 1).toDouble().pow(2).toInt()
+        val target = gate.targetQubit
+        val control = 2.0.pow(target).toInt()
+        val firstPlusPow = 2.0.pow(target + 1).toInt()
+        val opposingPow = 2.0.pow(numberOfQubits - target - 1).toInt()
 
         val localAmplitudes = arrayListOf<ComplexNumber>()
-        amplitudes.forEach { localAmplitudes.add(it) }
+        amplitudes.forEach { localAmplitudes.add(it.copy()) }
 
-        for (i in 0..firstPow) {
+        for (i in 0 until control) {
             var posJ = 0
-            for (j in 0..opposingPow) {
+            for (j in 0 until opposingPow) {
                 val pos1 = i + posJ
-                val pos2 = pos1 + firstPow
+                val pos2 = pos1 + control
 
-                val p1 = localAmplitudes[pos1]
-                val p2 = localAmplitudes[pos2]
+                val p1 = amplitudes[pos1]
+                val p2 = amplitudes[pos2]
 
                 localAmplitudes[pos1].real = (p1.real + p2.real) * MathConstants.Norm2
-                localAmplitudes[pos1].complex = (p1.complex + p2.complex) * MathConstants.Norm2
-                localAmplitudes[pos2].real = (p1.real - p2.real) * MathConstants.Norm2
+                localAmplitudes[pos1].complex = (p1.complex - p2.complex) * MathConstants.Norm2
+                localAmplitudes[pos2].real = (p1.real + p2.real) * MathConstants.Norm2
                 localAmplitudes[pos2].complex = (p1.complex - p2.complex) * MathConstants.Norm2
 
                 posJ += firstPlusPow

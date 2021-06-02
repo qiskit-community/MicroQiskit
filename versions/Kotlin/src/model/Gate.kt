@@ -4,7 +4,7 @@ import util.Circuits
 
 data class Gate(
     val circuitType: Circuits,
-    val first: Int,
-    val second: Int? = null,
+    val targetQubit: Int,
+    val controlQubit: Int? = null,
     val theta: Double? = null,
 )

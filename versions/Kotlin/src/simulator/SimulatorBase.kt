@@ -5,7 +5,7 @@ import model.QuantumCircuit
 import util.MathConstants
 import kotlin.math.pow
 
-open class SimulatorBase {
+abstract class SimulatorBase {
 
     open fun simulate(circuit: QuantumCircuit): List<ComplexNumber> {
         val sum = circuit.probabilitySum()
@@ -20,7 +20,9 @@ open class SimulatorBase {
             amplitudes
         } else {
             val amplitudes = arrayListOf<ComplexNumber>()
-            circuit.amplitudes.forEach { amplitudes.add(ComplexNumber(0.0, 0.0)) }
+            for (i in 0 until circuit.amplitudeLength) {
+                amplitudes.add(ComplexNumber(0.0, 0.0))
+            }
             amplitudes.first().real = 1.0
 
             amplitudes

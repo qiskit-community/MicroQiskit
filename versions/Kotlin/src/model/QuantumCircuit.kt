@@ -32,7 +32,7 @@ class QuantumCircuit(var numberOfQubits: Int, var numberOfOutputs: Int) {
 
     fun rz(targetQubit: Int, rotation: Double) {
         h(targetQubit)
-        rz(targetQubit, rotation)
+        rx(targetQubit, rotation)
         h(targetQubit)
     }
 
@@ -99,8 +99,8 @@ class QuantumCircuit(var numberOfQubits: Int, var numberOfOutputs: Int) {
 
     fun getAllNumbersString(length: Int): String {
         val builder = StringBuilder()
-        val numbers = arrayOf<Int>()
-        for (i in 0..length) numbers[i] = i
+        val numbers = arrayListOf<Int>()
+        for (i in 0..length) numbers.add(i)
         builder.append("[${numbers.joinToString(separator = ",")}]")
         return builder.toString()
     }
@@ -120,12 +120,12 @@ class QuantumCircuit(var numberOfQubits: Int, var numberOfOutputs: Int) {
 
         gates.forEach {
             when (it.circuitType) {
-                Circuits.X -> builder.append("qc.x(${it.first})\n")
-                Circuits.RX -> builder.append("qc.rx(${it.theta}, ${it.first})\n")
-                Circuits.H -> builder.append("qc.h(${it.first}, ${it.second})\n")
-                Circuits.CX -> builder.append("qc.cx(${it.first}, ${it.second})\n")
-                Circuits.CRX -> builder.append("qc.rx(${it.theta}, ${it.first}), ${it.second})\n")
-                Circuits.M -> builder.append("qc.measure(${it.first}, ${it.second})\n")
+                Circuits.X -> builder.append("qc.x(${it.targetQubit})\n")
+                Circuits.RX -> builder.append("qc.rx(${it.theta}, ${it.targetQubit})\n")
+                Circuits.H -> builder.append("qc.h(${it.targetQubit})\n")
+                Circuits.CX -> builder.append("qc.cx(${it.targetQubit}, ${it.controlQubit})\n")
+                Circuits.CRX -> builder.append("qc.rx(${it.theta}, ${it.targetQubit}), ${it.controlQubit})\n")
+                Circuits.M -> builder.append("qc.measure(${it.targetQubit}, ${it.controlQubit})\n")
             }
         }
 
