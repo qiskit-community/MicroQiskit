@@ -1,7 +1,8 @@
-package simulator
+package tests
 
 import model.QuantumCircuit
 import org.junit.jupiter.api.Test
+import simulator.MicroQiskitSimulator
 
 internal class GatesHandlerTest {
     private val simulator = MicroQiskitSimulator()
