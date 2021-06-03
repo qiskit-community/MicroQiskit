@@ -50,7 +50,7 @@ abstract class SimulatorBase {
     open fun getProbabilities(circuit: QuantumCircuit): List<Double> {
         val probabilities = arrayListOf<Double>()
         val length = 2.0.pow(circuit.numberOfQubits).toInt()
-        for (i in 0..length) probabilities.add(0.0)
+        for (i in 0 until length) probabilities.add(0.0)
         return probabilities
     }
 
