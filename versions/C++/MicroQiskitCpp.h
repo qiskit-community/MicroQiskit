@@ -1,11 +1,14 @@
 /*
-Comments in this file are mostly there to point out differences with the Python version of MicroQiskit, or to flag up jobs still to be done.
+Comments in this file are mostly there to point out differences with the Python version of MicroQiskit.
+Access the lastest official release here: https://github.com/qiskit-community/MicroQiskit/tree/master/versions/C%2B%2B
 
 For comments on what everything is supposed to do, see the Python version of MicroQiskit.
 https://github.com/quantumjim/MicroQiskit/blob/master/microqiskit.py
 https://github.com/qiskit-community/MicroQiskit
 
-The present version MicroQiskit in C++ has been the work of Omar Costa Hamdo and  Dr. James Wootton
+The present version of MicroQiskit in C++ has been the work of Omar Costa Hamdo and  Dr. James Wootton
+
+In development on replit (https://repl.it/@quantum_jim/MicroQiskitC) and on github (https://github.com/omarcostahamido/MicroQiskitCpp).
 */
 #ifndef MICROQISKITCPP_H
 #define MICROQISKITCPP_H
@@ -55,15 +58,10 @@ class QuantumCircuit {
     void add (QuantumCircuit qc2) {
 
       nBits = max(nBits,qc2.nBits);
-      //i think this is missing:
       nQubits = max(nQubits,qc2.nQubits);
-      //else we run the risk of adding a circuit that has gates making reference to a qubit that is out of range.
       for (int g=0; g<qc2.data.size(); g++){ 
         data.push_back( qc2.data[g] );
       }
-      // TO DO: It is only possible to add circuits with equal nQubits in MicroQiskit, and qc2.nBits cannot be non-zero if qc.nBits is.
-      // Abort and explain if the user provides other inputs.
-      //^ review this...
     }
 
     void initialize (vector<double> p){
@@ -188,7 +186,7 @@ class QuantumCircuit {
       //a full set of measurement gates must have a measure gate on each qubit in the circuit
       //create a list of all unique measure-gated qubits
       for(int num : mGates){
-        mUnique[mGates[num]]=1;//the 1 doesn't matter
+        mUnique[mGates[num]]=1;
       }
       //check if we have a measure gate for each qubit
       for(int i=0; i<nQubits; i++){
@@ -315,13 +313,11 @@ class Simulator {
                 ket[b0] = e1;
                 ket[b1] = e0;
               } else if (qc.data[g][0]=="ch"){
-                //TODO review
                 for (int k=0; k<2; k++){
                   ket[b0][k] = (e0[k] + e1[k])/sqrt(2);
                   ket[b1][k] = (e0[k] - e1[k])/sqrt(2);
                 }
               } else if (qc.data[g][0]=="crx"){
-                //TODO review
                 double theta = stof( qc.data[g][1] );
                 ket[b0][0] = e0[0]*cos(theta/2)+e1[1]*sin(theta/2);
                 ket[b0][1] = e0[1]*cos(theta/2)-e1[0]*sin(theta/2);
@@ -400,8 +396,6 @@ class Simulator {
         for (int j=0; j<probs.size();j++){
           cumu += probs[j];//this will add up to 1  
           if ((r<=cumu) && un){
-            
-            //here is my version:
             for( int w=0; w<bitstr.size(); w++ ){
               bool result = int(pow(2,w))&j;
               bitstr[qc.nQubits-1-w]= result?'1':'0';
@@ -418,7 +412,7 @@ class Simulator {
 
     map<string, int> get_counts () {
 
-      map<string, int> counts;//similar to dictionary
+      map<string, int> counts;
       vector<string> memory = get_memory();
       if(memory.size()>0){
         for (int s=0; s<shots; s++){
@@ -454,7 +448,6 @@ class Simulator {
           } else if (qc.data[g][0]=="m") {
             qiskitPy += "qc.measure("+qc.data[g][1]+","+qc.data[g][2]+")\n";
           } else if (qc.data[g][0]=="init") {
-            //TODO review to really conform with qiskit
             qiskitPy += "qc.initialize({"+qc.data[g][2];
 
             int initsize = stoi(qc.data[g][1]);
@@ -494,16 +487,6 @@ class Simulator {
             qasm += "crx("+qc.data[g][1]+") q["+qc.data[g][2]+"],q["+qc.data[g][3]+"];\n";
           } else if (qc.data[g][0]=="m") {
             qasm += "measure q["+qc.data[g][1]+"] -> c["+qc.data[g][2]+"];\n";
-          // and...
-          //} else if (qc.data[g][0]=="init") {
-            ////TODO review to really conform with qiskit
-            //qasm += "qc.initialize({"+qc.data[g][2];
-
-            //int initsize = stoi(qc.data[g][1]);
-            //for(int i=0; i<initsize-1; i++){
-              //qiskitPy += ","+qc.data[g][3+i];
-            //}
-            //qiskitPy += "})\n";
           }
       }
 

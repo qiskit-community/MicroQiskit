@@ -1,6 +1,6 @@
 # MicroQiskit for C++
 
-This version of MicroQiskit in C++ is in development on replit [here](https://repl.it/@quantum_jim/MicroQiskitC) and on a repo [here](https://github.com/omarcostahamido/MicroQiskitCpp). 
+This version of MicroQiskit in C++ is in development on replit [here](https://repl.it/@quantum_jim/MicroQiskitC) and on this github repo [here](https://github.com/omarcostahamido/MicroQiskitCpp). 
 
 ### Installation
 
