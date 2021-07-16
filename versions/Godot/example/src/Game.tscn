@@ -1,0 +1,91 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://src/micro-qiskit/QuantumNode.tscn" type="PackedScene" id=1]
+[ext_resource path="res://assets/bullet.png" type="Texture" id=2]
+[ext_resource path="res://src/Game.gd" type="Script" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 144, 8 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends PopupMenu
+
+func _ready() -> void:
+  self.add_item('x')
+  self.add_item('h')
+  self.add_item('z')
+  self.add_item('y')
+  self.add_item('rx with PI/4')
+  self.add_item('ry with PI/4')
+  self.add_item('rz with PI/4')
+  # self.add_item('cx') requires multiple qubits
+  # self.add_item('crx') requires multiple qubits
+  self.add_item('reset')
+"
+
+[node name="Game" type="Node2D"]
+script = ExtResource( 4 )
+
+[node name="QuantumNode" parent="." instance=ExtResource( 1 )]
+
+[node name="Barrier" type="RigidBody2D" parent="."]
+gravity_scale = 0.0
+custom_integrator = true
+
+[node name="bullet" type="Sprite" parent="Barrier"]
+position = Vector2( 200, 256 )
+scale = Vector2( 2.18182, 0.8 )
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Barrier"]
+position = Vector2( 200, 256 )
+shape = SubResource( 1 )
+
+[node name="DropTimer" type="Timer" parent="."]
+autostart = true
+
+[node name="QuantumDisplay" type="VBoxContainer" parent="."]
+margin_left = 248.0
+margin_top = 40.0
+margin_right = 352.0
+margin_bottom = 140.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Probability" type="RichTextLabel" parent="QuantumDisplay"]
+margin_right = 104.0
+margin_bottom = 15.0
+rect_min_size = Vector2( 80, 0 )
+fit_content_height = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Gates" type="RichTextLabel" parent="QuantumDisplay"]
+margin_top = 19.0
+margin_right = 104.0
+margin_bottom = 34.0
+rect_min_size = Vector2( 80, 0 )
+fit_content_height = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+margin_right = 20.0
+margin_bottom = 20.0
+script = SubResource( 3 )
+
+[node name="AddGatesBtn" type="Button" parent="."]
+margin_left = 248.0
+margin_top = 16.0
+margin_right = 326.0
+margin_bottom = 36.0
+text = "Add Gates"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="index_pressed" from="PopupMenu" to="." method="_on_PopupMenu_index_pressed"]
+[connection signal="pressed" from="AddGatesBtn" to="." method="_on_AddGatesBtn_pressed"]

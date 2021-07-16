@@ -1,0 +1,65 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "KinematicBody2D",
+"class": "Ball",
+"language": "GDScript",
+"path": "res://src/Ball.gd"
+}, {
+"base": "Node2D",
+"class": "Game",
+"language": "GDScript",
+"path": "res://src/Game.gd"
+}, {
+"base": "Node",
+"class": "QuantumCircuit",
+"language": "GDScript",
+"path": "res://src/micro-qiskit/QuantumCircuit.gd"
+}, {
+"base": "Node",
+"class": "QuantumNode",
+"language": "GDScript",
+"path": "res://src/micro-qiskit/QuantumNode.gd"
+}, {
+"base": "Node",
+"class": "QuantumSimulator",
+"language": "GDScript",
+"path": "res://src/micro-qiskit/Simulator.gd"
+} ]
+_global_script_class_icons={
+"Ball": "",
+"Game": "",
+"QuantumCircuit": "",
+"QuantumNode": "",
+"QuantumSimulator": ""
+}
+
+[application]
+
+config/name="Sample Godot Quantum Game"
+run/main_scene="res://src/Game.tscn"
+config/icon="res://icon.png"
+
+[display]
+
+window/size/width=400
+window/size/height=300
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
+vram_compression/import_etc2=false
+environment/default_environment="res://default_env.tres"
